@@ -9,23 +9,42 @@
 
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
 import BridgeListScreen from './app/screens/BridgeListScreen';
 import BridgeDetailScreen from './app/screens/BridgeDetailScreen';
+import LoginScreen from './app/screens/LoginScreen';
 
-
-
-const BridgeStack = createStackNavigator({
-  Home: {
-    screen: BridgeListScreen,
-  },
-  BridgeDetail: {
-    screen: BridgeDetailScreen,
+const LoginStack = createStackNavigator({
+  Login: {
+    screen: LoginScreen,
+    params: {
+      title: 'Login',
+    }
   }
 });
 
+const BridgeStack = createStackNavigator({
+  List: {
+    screen: BridgeListScreen,
+    params: {
+      title: 'Bridges',
+    }
+  },
+  Detail: {
+    screen: BridgeDetailScreen,    
+  }
+});
 
-const AppContainer = createAppContainer(BridgeStack);
+const DrawerNavigation = createDrawerNavigator({
+  Bridges: BridgeStack,
+  Login: LoginStack,
+},
+  {
+    initialRouteName: 'Login'
+  });
+
+
+const AppContainer = createAppContainer(DrawerNavigation);
 
 type Props = {};
 export default class App extends Component<Props> {

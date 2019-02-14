@@ -6,7 +6,7 @@ import {
     Button
 } from 'react-native'
 
-export default class BridgeListScreen extends Component {
+export default class LoginScreen extends Component {
     constructor(props) {
         super(props);
     }
@@ -19,11 +19,9 @@ export default class BridgeListScreen extends Component {
     };
 
     render() {
-        const { navigate } = this.props.navigation
         return (
             <View style={styles.container}>
-                <Text onPress={() => navigate('Detail', { BridgeName: 'chelsea street bridge' })}>OPEN DETAIL</Text>
-                <Text onPress={() => navigate('Detail', { BridgeName: 'cambridge street bridge' })}>OPEN DETAIL</Text>
+                <Text>Login</Text>
             </View>
         )
     }

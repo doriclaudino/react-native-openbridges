@@ -10,6 +10,12 @@ export default class BridgeDetailScreen extends Component {
         super(props);
     }
 
+    static navigationOptions = ({ navigation }) => {
+        return ({
+            title: navigation.getParam('BridgeName', 'default'),
+        })
+    };
+
     render() {
         return (
             <View style={styles.container}>
