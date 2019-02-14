@@ -7,8 +7,33 @@
  * @lint-ignore-every XPLATJSCOPYRIGHT1
  */
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import React, { Component } from 'react';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator, createAppContainer } from "react-navigation";
+import BridgeListScreen from './app/screens/BridgeListScreen';
+import BridgeDetailScreen from './app/screens/BridgeDetailScreen';
+
+
+
+const BridgeStack = createStackNavigator({
+  Home: {
+    screen: BridgeListScreen,
+  },
+  BridgeDetail: {
+    screen: BridgeDetailScreen,
+  }
+});
+
+
+const AppContainer = createAppContainer(BridgeStack);
+
+type Props = {};
+export default class App extends Component<Props> {
+  render() {
+    return <AppContainer />;
+  }
+}
+
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -17,18 +42,7 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
-export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
-    );
-  }
-}
+
 
 const styles = StyleSheet.create({
   container: {
