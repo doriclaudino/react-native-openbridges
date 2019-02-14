@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "697298715042",
+    "firebase_url": "https://bridge-react-native-mobx.firebaseio.com",
+    "project_id": "bridge-react-native-mobx",
+    "storage_bucket": "bridge-react-native-mobx.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697298715042:android:0f4baa5e730edbb0",
+        "android_client_info": {
+          "package_name": "com.doriclaudino.openbridges"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697298715042-5not9594tulc4jrfjm8fqfo6i1m85bem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.doriclaudino.openbridges",
+            "certificate_hash": "a038067879b856b43d8866d71d6d44a127e85be3"
+          }
+        },
+        {
+          "client_id": "697298715042-ta9fsnved153fdsubmgu293q9kjjdh8i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtm8kfewrTH57KewSsK8MxvYqyNYCBqI4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697298715042-ta9fsnved153fdsubmgu293q9kjjdh8i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "697298715042-kjubb1d9q6dl9ijldeo8oh77utj13lij.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "host.exp.exponent"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.openbridges;
+package com.doriclaudino.openbridges;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

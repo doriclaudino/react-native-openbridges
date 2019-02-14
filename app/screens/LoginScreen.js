@@ -6,6 +6,7 @@ import {
     Button
 } from 'react-native'
 import { Appbar } from 'react-native-paper';
+import firebase from 'react-native-firebase';
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -23,10 +24,22 @@ export default class LoginScreen extends Component {
         })
     };
 
+    tryLogIn = () => {
+        console.log('trying login')
+        firebase.auth()
+            .signInAnonymously()
+            .then(credential => {
+                if (credential) {
+                    console.log('default app user ->', credential.user.toJSON());
+                }
+            });
+    }
+
     render() {
         return (
             <View style={styles.container}>
                 <Text>Login</Text>
+                <Button title="LOG-IN" onPress={this.tryLogIn}></Button>
             </View>
         )
     }
