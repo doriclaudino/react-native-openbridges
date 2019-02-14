@@ -5,6 +5,7 @@ import {
     Text,
     Button
 } from 'react-native'
+import { Appbar } from 'react-native-paper';
 
 export default class BridgeListScreen extends Component {
     constructor(props) {
@@ -13,8 +14,12 @@ export default class BridgeListScreen extends Component {
 
     static navigationOptions = ({ navigation }) => {
         return ({
-            headerLeft: () => (<Button title="menu" onPress={() => navigation.openDrawer()}></Button>),
-            title: navigation.getParam('title', 'default'),
+            header: (
+                <Appbar.Header>
+                    <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+                    <Appbar.Content title={navigation.getParam('title', 'default')} />
+                </Appbar.Header>
+            )
         })
     };
 
@@ -22,7 +27,7 @@ export default class BridgeListScreen extends Component {
         const { navigate } = this.props.navigation
         return (
             <View style={styles.container}>
-                <Text onPress={() => navigate('Detail', { BridgeName: 'chelsea street bridge' })}>OPEN DETAIL</Text>
+                <Text onPress={() => navigate('Detail', { BridgeName: 'chelsea street bridge' })}>OPEN DETAIL 1</Text>
                 <Text onPress={() => navigate('Detail', { BridgeName: 'cambridge street bridge' })}>OPEN DETAIL</Text>
             </View>
         )
