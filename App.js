@@ -13,6 +13,7 @@ import { createStackNavigator, createAppContainer, createDrawerNavigator } from 
 import BridgeListScreen from './app/screens/BridgeListScreen';
 import BridgeDetailScreen from './app/screens/BridgeDetailScreen';
 import LoginScreen from './app/screens/LoginScreen';
+import PhoneScreen from './app/screens/PhoneScreen';
 
 const LoginStack = createStackNavigator({
   Login: {
@@ -23,6 +24,15 @@ const LoginStack = createStackNavigator({
   }
 });
 
+const PhoneAuthStack = createStackNavigator({
+  PhoneScreen: {
+    screen: PhoneScreen,
+    params: {
+      title: 'PhoneScreen',
+    }
+  },
+});
+
 const BridgeStack = createStackNavigator({
   List: {
     screen: BridgeListScreen,
@@ -31,13 +41,14 @@ const BridgeStack = createStackNavigator({
     }
   },
   Detail: {
-    screen: BridgeDetailScreen,    
+    screen: BridgeDetailScreen,
   }
 });
 
 const DrawerNavigation = createDrawerNavigator({
   Bridges: BridgeStack,
   Login: LoginStack,
+  PhoneAuth: PhoneAuthStack,
 },
   {
     initialRouteName: 'Login'
