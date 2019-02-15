@@ -42,6 +42,8 @@ Project to track the DrawBridges status (up/down)
     * react-native log-ios
     * react-native log-android
     * react-devtools
+    * adb shell am start -n packagename/.MainActivity `(reopen the app)`
+    * adb shell input text "word" `usefull when retype from pc`
 
 
 for more:
