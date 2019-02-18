@@ -14,10 +14,10 @@ import {
     TouchableOpacity,
     View,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 
-import Spinner from 'react-native-loading-spinner-overlay';
 import Form from 'react-native-form';
 import { Appbar, Button } from 'react-native-paper';
 import CountryPicker from 'react-native-country-picker-modal';
@@ -49,10 +49,8 @@ export default class PhoneScreen extends Component {
     };
 
     _getCode = () => {
-
         this.setState({ spinner: true });
         setTimeout(async () => {
-
             try {
                 const { phoneNumber } = this.refs.form.getValues()
                 const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
@@ -74,14 +72,10 @@ export default class PhoneScreen extends Component {
         }, 100);
     }
 
-
     _showError = (title, message) => {
         this.setState({
             spinner: false,
-        });
-        setTimeout(() => {
-            Alert.alert(title, message);
-        }, 100)
+        }, () => Alert.alert(title, message));
     }
 
     _verifyCode = () => {
@@ -107,7 +101,6 @@ export default class PhoneScreen extends Component {
                         .catch(error => this._showError('Oops!', error.message));
                 } else
                     this.setState({ spinner: false });
-
                 this.refs.form.refs.textInput.blur();
             } catch (err) {
                 this._showError('Oops!', error.message)
@@ -178,12 +171,10 @@ export default class PhoneScreen extends Component {
     }
 
     _renderCallingCode = () => {
-
         if (this.state.enterCode)
             return (
                 <View />
             );
-
         return (
             <View style={styles.callingCodeView}>
                 <Text style={styles.callingCodeText}>+{this.state.country.callingCode}</Text>
@@ -212,11 +203,13 @@ export default class PhoneScreen extends Component {
 
                 <Form ref={'form'} style={styles.form}>
 
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+
+                        {/** fix 60 px to stop button/children moving around */}
+                        <View style={{ minHeight: 50 }}></View>
 
                         {this._renderCountryPicker()}
                         {this._renderCallingCode()}
-
                         <TextInput
                             ref={'textInput'}
                             name={this.state.enterCode ? 'code' : 'phoneNumber'}
@@ -233,23 +226,14 @@ export default class PhoneScreen extends Component {
                             placeholderTextColor={brandColor}
                             selectionColor={brandColor}
                             maxLength={this.state.enterCode ? 6 : 20}
-                            onSubmitEditing={this._getSubmitAction} />
-
+                            onSubmitEditing={this._getSubmitAction}
+                            blurOnSubmit={true}
+                        />
                     </View>
-
-                    <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
-                        <Text style={styles.buttonText}>{buttonText}</Text>
-                    </TouchableOpacity>
-
+                    {/**add-a-photo icon use the same color of the button just to make a fake space to ActivityIcon */}
+                    <Button mode="contained" style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} color="#744BAC" onPress={this._getSubmitAction}>{buttonText}</Button>
                     {this._renderFooter()}
-
                 </Form>
-
-                <Spinner
-                    visible={this.state.spinner}
-                    textContent={'One moment...'}
-                    textStyle={{ color: '#fff' }} />
-
             </View>
 
         );
