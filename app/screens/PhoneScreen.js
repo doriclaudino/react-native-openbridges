@@ -49,64 +49,48 @@ export default class PhoneScreen extends Component {
     };
 
     _getCode = () => {
-        this.setState({ spinner: true });
-        setTimeout(async () => {
-            try {
-                const { phoneNumber } = this.refs.form.getValues()
-                const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
-                console.log({ phoneNumberWithCountryCode })
-                firebase.auth().signInWithPhoneNumber(phoneNumberWithCountryCode)
-                    .then(confirmResult => {
-                        this.setState({
-                            confirmResult,
-                            spinner: false,
-                            enterCode: true,
-                        })
-                    })
-                    .catch(error => this._showError('Oops!', error.message));
+        this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
+        try {
+            const { phoneNumber } = this.refs.form.getValues()
+            const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
+            firebase.auth().signInWithPhoneNumber(phoneNumberWithCountryCode)
+                .then(confirmResult => {
+                    this.setState({
+                        confirmResult,
+                        spinner: false,
+                        enterCode: true,
+                    },
+                        this.refs.form.refs.textInput.focus())
+                })
+                .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => this.refs.form.refs.textInput.focus() }], { cancelable: false }));
 
-            } catch (err) {
-                this._showError('Oops!', error.message)
-            }
-
-        }, 100);
+        } catch (err) {
+            this._showError('Oops!', error.message)
+        }
     }
 
-    _showError = (title, message) => {
+    _showError = (...args) => {
         this.setState({
             spinner: false,
-        }, () => Alert.alert(title, message));
+        }, () => Alert.alert(...args));
     }
 
     _verifyCode = () => {
-        console.log('_verifyCode')
-        this.setState({ spinner: true });
-        setTimeout(async () => {
-            try {
-                const { confirmResult } = this.state;
-                const { code } = this.refs.form.getValues()
-                if (confirmResult) {
-                    confirmResult.confirm(code)
-                        .then((user) => {
-                            console.log(user)
-                            setTimeout(() => {
-                                Alert.alert('Success!', 'You have successfully verified your phone number', [
-                                    {
-                                        text: 'OK', onPress: () => {
-                                            this._tryAgain();
-                                        }
-                                    }])
-                            }, 100);
-                        })
-                        .catch(error => this._showError('Oops!', error.message));
-                } else
-                    this.setState({ spinner: false });
-                this.refs.form.refs.textInput.blur();
-            } catch (err) {
-                this._showError('Oops!', error.message)
-            }
-        }, 100);
-
+        this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
+        try {
+            const { confirmResult } = this.state;
+            const { code } = this.refs.form.getValues()
+            if (confirmResult) {
+                confirmResult.confirm(code)
+                    .then((user) => {
+                        Alert.alert('Success!', 'You have successfully verified your phone number', [{ text: 'OK', onPress: () => this._tryAgain() }])
+                    })
+                    .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => this.refs.form.refs.textInput.focus() }], { cancelable: false }));
+            } else
+                this.setState({ spinner: false });
+        } catch (err) {
+            this._showError('Oops!', error.message)
+        }
     }
 
     _onChangeText = (val) => {
