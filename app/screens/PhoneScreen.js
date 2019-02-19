@@ -15,7 +15,8 @@ import {
     View,
     Platform,
     Alert,
-    ActivityIndicator
+    ActivityIndicator,
+    Keyboard
 } from 'react-native';
 
 import Form from 'react-native-form';
@@ -26,6 +27,7 @@ import firebase from 'react-native-firebase';
 export default class PhoneScreen extends Component {
 
     constructor(props) {
+
         super(props);
         this.state = {
             enterCode: false,
@@ -41,7 +43,7 @@ export default class PhoneScreen extends Component {
         return ({
             header: (
                 <Appbar.Header>
-                    <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
+                    <Appbar.Action icon="menu" onPress={() => { Keyboard.dismiss(); navigation.openDrawer(); }} />
                     <Appbar.Content title={navigation.getParam('title', 'default')} />
                 </Appbar.Header>
             )
