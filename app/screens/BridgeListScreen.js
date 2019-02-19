@@ -1,11 +1,25 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
 import React, { Component } from 'react'
 import {
     StyleSheet,
     View,
     Text,
-    Button
+    Button,
+    FlatList,
+    Image
 } from 'react-native'
-import { Appbar } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple } from 'react-native-paper';
+import bridges from '../store/BridgeStore'
+
+
+const _capitalize = (string) => {
+    return string.toLowerCase().split(' ').map((a) => a.charAt(0).toUpperCase() + a.substr(1)).join(' ')
+}
 
 export default class BridgeListScreen extends Component {
     constructor(props) {
@@ -23,12 +37,33 @@ export default class BridgeListScreen extends Component {
         })
     };
 
+    _onItemListClick = (navigateTo, item) => {
+        this.props.navigation.navigate(navigateTo, item);
+    }
+
+
     render() {
-        const { navigate } = this.props.navigation
+        filteredBridges = bridges
         return (
             <View style={styles.container}>
-                <Text onPress={() => navigate('Detail', { BridgeName: 'chelsea street bridge' })}>OPEN DETAIL 1</Text>
-                <Text onPress={() => navigate('Detail', { BridgeName: 'cambridge street bridge' })}>OPEN DETAIL</Text>
+                <FlatList
+                    style={styles.container}
+                    data={filteredBridges}
+                    extraData={filteredBridges}
+                    keyExtractor={(item, index) => `${item.id}`}
+                    renderItem={({ item }) =>
+                        <View>
+                            <Divider />
+                            <TouchableRipple onPress={() => this._onItemListClick('Detail', { bridge: item })} style={{ padding: 4 }}>
+                                <View style={{ flex: 1, flexDirection: 'row' }}>
+                                    <Image style={{ width: 100, height: 60, overflow: 'hidden', borderRadius: 10 }} source={{ uri: item.src }} />
+                                    <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap", paddingHorizontal: 4, flexGrow: 2 }}>{_capitalize(item.name)}</Text>
+                                    <List.Icon icon="keyboard-arrow-right" />
+                                </View>
+                            </TouchableRipple>
+                        </View>
+                    }
+                />
             </View>
         )
     }
@@ -38,4 +73,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    item: { padding: 20 },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        marginHorizontal: 10,
+        marginTop: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 15,
+        borderRadius: 5,
+        borderColor: 'gray',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowColor: 'gray',
+        elevation: 2
+    }
 })

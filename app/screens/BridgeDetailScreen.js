@@ -19,7 +19,7 @@ export default class BridgeDetailScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>{this.props.navigation.state.params.BridgeName}</Text>
+                <Text>{this.props.navigation.state.params.bridge.name}</Text>
             </View>
         )
     }

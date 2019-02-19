@@ -51,7 +51,7 @@ const DrawerNavigation = createDrawerNavigator({
   PhoneAuth: PhoneAuthStack,
 },
   {
-    initialRouteName: 'PhoneAuth'
+    initialRouteName: 'Bridges'
   });
 
 
