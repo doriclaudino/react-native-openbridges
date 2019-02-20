@@ -16,6 +16,7 @@ import LoginScreen from './app/screens/LoginScreen';
 import PhoneScreen from './app/screens/PhoneScreen';
 import { Provider } from 'react-redux'
 import { store } from './app/store/BridgeStore';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 const LoginStack = createStackNavigator({
   Login: {
@@ -62,7 +63,11 @@ const AppContainer = createAppContainer(DrawerNavigation);
 type Props = {};
 export default class App extends Component<Props> {
   render() {
-    return <Provider store={store}><AppContainer /></Provider>
+    return <Provider store={store}>
+      <PaperProvider>
+        <AppContainer />
+      </PaperProvider>
+    </Provider>
   }
 }
 

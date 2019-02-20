@@ -6,6 +6,11 @@ export const addBridges = payload => ({
     payload,
 });
 
+export const delBridgeEvent = (payload) => ({
+    type: 'DEL_BRIDGE_EVENT',
+    payload,
+});
+
 export const clearBridges = () => ({ type: 'CLEAR_BRIDGES' });
 
 export const fetchbridges = () => async dispatch => {
