@@ -14,16 +14,26 @@ import {
     Image
 } from 'react-native'
 import { Appbar, Divider, List, TouchableRipple } from 'react-native-paper';
-import bridges from '../store/BridgeStore'
+import { connect } from 'react-redux';
+import { fetchbridges } from '../actions';
 
+const mapStateToProps = (state) => {
+    return { bridges: state.bridges }
+}
+
+const mapDispatchToProps = { fetchbridges }
 
 const _capitalize = (string) => {
     return string.toLowerCase().split(' ').map((a) => a.charAt(0).toUpperCase() + a.substr(1)).join(' ')
 }
 
-export default class BridgeListScreen extends Component {
+class BridgeListScreen extends Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount = () => {
+        this.props.fetchbridges();
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -43,7 +53,7 @@ export default class BridgeListScreen extends Component {
 
 
     render() {
-        filteredBridges = bridges
+        filteredBridges = this.props.bridges
         return (
             <View style={styles.container}>
                 <FlatList
@@ -68,6 +78,8 @@ export default class BridgeListScreen extends Component {
         )
     }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(BridgeListScreen)
 
 const styles = StyleSheet.create({
     container: {

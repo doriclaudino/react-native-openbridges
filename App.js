@@ -14,6 +14,8 @@ import BridgeListScreen from './app/screens/BridgeListScreen';
 import BridgeDetailScreen from './app/screens/BridgeDetailScreen';
 import LoginScreen from './app/screens/LoginScreen';
 import PhoneScreen from './app/screens/PhoneScreen';
+import { Provider } from 'react-redux'
+import { store } from './app/store/BridgeStore';
 
 const LoginStack = createStackNavigator({
   Login: {
@@ -60,7 +62,7 @@ const AppContainer = createAppContainer(DrawerNavigation);
 type Props = {};
 export default class App extends Component<Props> {
   render() {
-    return <AppContainer />;
+    return <Provider store={store}><AppContainer /></Provider>
   }
 }
 

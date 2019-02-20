@@ -6,7 +6,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "rebuild": "npm run bug && react-native run-android",
-    "reopen": "awk '{ match($0, /package\\=\"(.+\\>)/, arr); if(arr[1] != \"\") {system(\"adb shell am start -n \" arr[1] \"/.MainActivity\")} }' ./android/app/src/main/AndroidManifest.xml",
+    "stop-activity": "awk '{ match($0, /package\\=\"(.+\\>)/, arr); if(arr[1] != \"\") {system(\"adb shell am force-stop \" arr[1])} }' ./android/app/src/main/AndroidManifest.xml",
+    "start-activity": "awk '{ match($0, /package\\=\"(.+\\>)/, arr); if(arr[1] != \"\") {system(\"adb shell am start -n \" arr[1] \"/.MainActivity\")} }' ./android/app/src/main/AndroidManifest.xml",
+    "reopen": "npm run stop-activity && npm run start-activity",
     "bug": "rimraf ./android/app/build/generated/res/google-services/debug"
   },
   "dependencies": {
@@ -20,7 +22,10 @@
     "react-native-paper": "^2.11.0",
     "react-native-phone-input": "^0.2.1",
     "react-native-vector-icons": "^6.3.0",
-    "react-navigation": "^3.2.3"
+    "react-navigation": "^3.2.3",
+    "react-redux": "^6.0.0",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "babel-core": "7.0.0-bridge.0",
