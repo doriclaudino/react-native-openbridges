@@ -44,6 +44,7 @@ Project to track the DrawBridges status (up/down)
     * react-devtools
     * adb shell am start -n packagename/.MainActivity `(reopen the app)`
     * adb shell input text "word" `usefull when retype from pc`
+    * npm start -- --reset-cache `reset cache`
 
 
 for more:
