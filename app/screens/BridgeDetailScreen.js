@@ -8,7 +8,6 @@ import {
 } from 'react-native'
 import { Button, Card, Title, List, Divider, TouchableRipple, Appbar } from 'react-native-paper';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import moment from 'moment'
 import Moment from 'react-moment';
 import DialogSlider from '../components/DialogSlider';
 import DialogRadioButton from '../components/DialogRadioButton';
@@ -36,10 +35,10 @@ class BridgeDetailScreen extends Component {
 
         this.state = {
             isDateTimePickerVisible: false,
-            isModalVisible: false,
+            isDialogRadioButtonVisible: false,
+            isDialogSliderVisible: false,
             selectedStatus: null,
             selectedDateTime: null,
-            isSliderModalVisible: false,
         };
     }
 
@@ -50,17 +49,43 @@ class BridgeDetailScreen extends Component {
                 <Appbar.Header>
                     <Appbar.BackAction onPress={() => navigation.goBack()} />
                     <Appbar.Content title={capitalize(navigation.state.params.bridge.name)} />
-                    <Appbar.Action icon="settings" onPress={() => { navigation.state.params.onConfigClick() }} />
+                    <Appbar.Action icon="settings" disabled={!navigation.state.params.onDialogSliderClick} onPress={() => { navigation.state.params.onDialogSliderClick() }} />
                 </Appbar.Header>
             )
         }
     };
 
     componentWillMount() {
-        //** need fix setState delay */
+        //** need fix setState delay with disabled={!navigation.state.params.onDialogSliderClick}*/
         this.props.navigation.setParams({
-            onConfigClick: this._showSliderModal
+            onDialogSliderClick: this._flagDialogSlider
         });
+    }
+
+    _renderDialogSlider = (bridge) => {
+        return (<DialogSlider
+            visible={true}
+            onClose={this._flagDialogSlider}
+            onConfirm={this._handleDialogSlider}
+            defaultValue={bridge.statusThreshold}
+        />)
+    }
+
+    _renderDialogRadioButton = () => {
+        return (<DialogRadioButton
+            visible={true}
+            onClose={this._flagDialogRadioButton}
+            onConfirm={this._handleDialogRadioButton}
+            checked='Close' />)
+    }
+    _renderDateTimePicker = () => {
+        return (<DateTimePicker
+            date={new Date()}
+            mode='datetime'
+            isVisible={true}
+            onConfirm={this._handleDateTimePicker}
+            onCancel={this._flagDateTimePicker}
+        />)
     }
 
     render() {
@@ -71,26 +96,10 @@ class BridgeDetailScreen extends Component {
                 style={[styles.container]}
                 contentContainerStyle={styles.content}
             >
-                <DialogSlider
-                    visible={this.state.isSliderModalVisible}
-                    onClose={this._hideSliderModal}
-                    onConfirm={this._handleSliderModal}
-                    defaultValue={bridge.statusThreshold}
-                />
+                {this.state.isDialogSliderVisible && this._renderDialogSlider(bridge)}
+                {this.state.isDialogRadioButtonVisible && this._renderDialogRadioButton(bridge)}
+                {this.state.isDateTimePickerVisible && this._renderDateTimePicker(bridge)}
 
-                <DialogRadioButton
-                    visible={this.state.isModalVisible}
-                    onClose={this._hideOptionModal}
-                    onConfirm={this._handleOptionModal}
-                    checked='Close' />
-
-                <DateTimePicker
-                    date={new Date()}
-                    mode='datetime'
-                    isVisible={this.state.isDateTimePickerVisible}
-                    onConfirm={this._handleDatePicked}
-                    onCancel={this._hideDateTimePicker}
-                />
                 <Card style={styles.card}>
                     <Card.Cover source={{ uri: bridge.src }} />
                 </Card>
@@ -99,7 +108,7 @@ class BridgeDetailScreen extends Component {
                     <Card.Content>
                         <Title>Events</Title>
                         <Card.Actions>
-                            <Button onPress={() => { this._showOptionModal() }}>Add</Button>
+                            <Button onPress={() => { this._flagDialogRadioButton() }}>Add</Button>
                         </Card.Actions>
                         <FlatList
                             style={styles.container}
@@ -109,11 +118,10 @@ class BridgeDetailScreen extends Component {
                             renderItem={({ item }) => <View><Divider />
                                 <List.Item
                                     title={item.status}
-                                    description={this._formatDate(item.when)}
+                                    description={(<Moment element={Text} format={'llll'}>{item.when}</Moment>)}
                                     onPress={() => { }}
                                     left={() => (<TouchableRipple onPress={() => { }}><List.Icon icon="schedule" /></TouchableRipple >)}
                                     right={item.when ? () => (<TouchableRipple onPress={() => { this._handleDeleteEvent(bridge, item) }}><List.Icon icon="delete" /></TouchableRipple >) : null}
-
                                 /></View>}
                         />
                     </Card.Content>
@@ -122,47 +130,32 @@ class BridgeDetailScreen extends Component {
         )
     }
 
-    /** Modal and datepicker */
-    _showDateTimePicker = () => this.setState({ currentDate: new Date(), isDateTimePickerVisible: true });
+    /** flags */
+    _flagDateTimePicker = () => this.setState({ isDateTimePickerVisible: !this.state.isDateTimePickerVisible });
+    _flagDialogSlider = () => this.setState({ isDialogSliderVisible: !this.state.isDialogSliderVisible });
+    _flagDialogRadioButton = () => this.setState({ isDialogRadioButtonVisible: !this.state.isDialogRadioButtonVisible });
 
-    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
-
-    _showOptionModal = () => this.setState({ isModalVisible: true });
-
-    _hideOptionModal = () => this.setState({ isModalVisible: false });
-
-    _handleOptionModal = (selected) => {
+    _handleDialogRadioButton = (selected) => {
         this.setState({ selectedStatus: selected });
-        this._hideOptionModal();
-        this._showDateTimePicker();
+        this._flagDialogRadioButton();
+        this._flagDateTimePicker();
     };
 
-    _handleDatePicked = (date) => {
+    _handleDateTimePicker = (date) => {
         this.setState({ selectedDateTime: date });
-        this._hideDateTimePicker();
+        this._flagDateTimePicker();
         this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date, id: v3() } })
     };
 
-
-    /** Slider modal for Threshold */
-    _showSliderModal = () => this.setState({ isSliderModalVisible: true });
-
-    _hideSliderModal = () => this.setState({ isSliderModalVisible: false });
-
-    _handleSliderModal = (newThreshold) => {
+    _handleDialogSlider = (newThreshold) => {
         this.props.addBridgeStatusThreshold({ bridge: this.props.bridge, statusThreshold: newThreshold });
-        this._hideSliderModal()
+        this._flagDialogSlider()
     };
 
     _handleDeleteEvent = (bridge, event) => {
         this.props.delBridgeEvent({ bridge, event })
     };
-
-    _formatDate = (date) => {
-        return new moment(date).format('llll');
-    }
 }
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(BridgeDetailScreen)
 
