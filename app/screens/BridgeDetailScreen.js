@@ -22,8 +22,9 @@ Moment.globalFilter = (d) => {
     return d.toUpperCase();
 };
 
-const mapStateToProps = (state) => {
-    return { bridge: state.bridges }
+const mapStateToProps = (state, { navigation }) => {
+    bridge = state.bridges.find(bridge => bridge.id === navigation.state.params.bridge.id)
+    return { bridge }
 }
 
 const mapDispatchToProps = { delBridgeEvent }
@@ -62,7 +63,7 @@ class BridgeDetailScreen extends Component {
     }
 
     render() {
-        const { bridge } = this.props.navigation.state.params
+        const { bridge } = this.props
         const { events } = bridge
         return (
             <ScrollView
@@ -155,13 +156,7 @@ class BridgeDetailScreen extends Component {
     _handleDeleteEvent = (bridge, event) => {
         this.props.delBridgeEvent({ bridge, event })
         //**** update here */
-        delete bridge.events.filter(ev=> ev.id!==event.id)
-
-        setTimeout(() => {
-            const { length } = this.props.navigation.state.params.bridge.events
-            console.log(length)
-            this.forceUpdate()
-        }, 5000);
+        //delete bridge.events.filter(ev => ev.id !== event.id)
     };
 
     _formatDate = (date) => {
@@ -170,7 +165,7 @@ class BridgeDetailScreen extends Component {
 }
 
 
-export default connect(null, mapDispatchToProps)(BridgeDetailScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(BridgeDetailScreen)
 
 const styles = StyleSheet.create({
     container: {

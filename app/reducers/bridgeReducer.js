@@ -1,6 +1,5 @@
 export const bridgeReducer = (state = [], action) => {
     console.log(action)
-    console.log(state)
     switch (action.type) {
         case 'ADD_BRIDGES':
             return action.payload;
@@ -15,7 +14,6 @@ export const bridgeReducer = (state = [], action) => {
 
 
 function removeItem(array, action) {
-    console.log(`removeItem`)
     return array.filter((item) => item.id !== action.id)
 }
 
