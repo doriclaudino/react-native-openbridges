@@ -6,8 +6,18 @@ export const addBridges = payload => ({
     payload,
 });
 
+export const addBridgeStatusThreshold = payload => ({
+    type: 'ADD_BRIDGE_STATUS_THRESHOLD',
+    payload,
+});
+
 export const delBridgeEvent = (payload) => ({
     type: 'DEL_BRIDGE_EVENT',
+    payload,
+});
+
+export const addBridgeEvent = (payload) => ({
+    type: 'ADD_BRIDGE_EVENT',
     payload,
 });
 

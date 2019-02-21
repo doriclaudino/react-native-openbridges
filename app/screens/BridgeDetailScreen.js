@@ -13,8 +13,9 @@ import Moment from 'react-moment';
 import DialogSlider from '../components/DialogSlider';
 import DialogRadioButton from '../components/DialogRadioButton';
 import { capitalize } from '../helpers'
-import { delBridgeEvent } from '../actions'
+import { addBridgeEvent, delBridgeEvent, addBridgeStatusThreshold } from '../actions'
 import { connect } from 'react-redux';
+import v3 from 'uuid'
 
 
 // Upper case all rendered dates.
@@ -27,14 +28,13 @@ const mapStateToProps = (state, { navigation }) => {
     return { bridge }
 }
 
-const mapDispatchToProps = { delBridgeEvent }
+const mapDispatchToProps = { addBridgeEvent, delBridgeEvent, addBridgeStatusThreshold }
 
 class BridgeDetailScreen extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            currentDate: new Date(),
             isDateTimePickerVisible: false,
             isModalVisible: false,
             selectedStatus: null,
@@ -56,7 +56,8 @@ class BridgeDetailScreen extends Component {
         }
     };
 
-    componentDidMount() {
+    componentWillMount() {
+        //** need fix setState delay */
         this.props.navigation.setParams({
             onConfigClick: this._showSliderModal
         });
@@ -84,7 +85,7 @@ class BridgeDetailScreen extends Component {
                     checked='Close' />
 
                 <DateTimePicker
-                    date={this.state.currentDate}
+                    date={new Date()}
                     mode='datetime'
                     isVisible={this.state.isDateTimePickerVisible}
                     onConfirm={this._handleDatePicked}
@@ -139,8 +140,7 @@ class BridgeDetailScreen extends Component {
     _handleDatePicked = (date) => {
         this.setState({ selectedDateTime: date });
         this._hideDateTimePicker();
-
-        //rootStore.bridgeStore.addEvent({ status: this.state.selectedStatus, when: date })
+        this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date, id: v3() } })
     };
 
 
@@ -150,13 +150,12 @@ class BridgeDetailScreen extends Component {
     _hideSliderModal = () => this.setState({ isSliderModalVisible: false });
 
     _handleSliderModal = (newThreshold) => {
+        this.props.addBridgeStatusThreshold({ bridge: this.props.bridge, statusThreshold: newThreshold });
         this._hideSliderModal()
     };
 
     _handleDeleteEvent = (bridge, event) => {
         this.props.delBridgeEvent({ bridge, event })
-        //**** update here */
-        //delete bridge.events.filter(ev => ev.id !== event.id)
     };
 
     _formatDate = (date) => {
