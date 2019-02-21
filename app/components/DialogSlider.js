@@ -11,19 +11,20 @@ import {
 export default class extends React.Component {
     constructor(props) {
         super(props);
-        currentValue = this.props.defaultValue
+        this.state = {
+            currentValue: this.props.defaultValue,
+            defaultValue: this.props.defaultValue,
+        }
     }
 
-    _onValueChange = (value) => {
-        this.currentValue = value
-    }
+    _onValueChange = (value) => this.setState({ currentValue: value })
 
-    _setDefaultValue = () => {
-        this.currentValue = this.props.defaultValue
-    }
+
+    _setDefaultValue = () => this.setState({ currentValue: this.state.defaultValue })
 
     render() {
         const { visible, onClose, onConfirm } = this.props;
+        const { currentValue } = this.state;
         return (
             <Portal>
                 <Dialog onDismiss={() => { this._setDefaultValue(); onClose(); }} visible={visible}>
@@ -33,8 +34,8 @@ export default class extends React.Component {
                             <View>
                                 <Dialog.Content>
                                     <Paragraph style={{ paddingBottom: 30 }}>
-                                        Automatically changes bridge status <Text style={{ fontWeight: 'bold', }}>{this.currentValue}  min</Text> before event occurs</Paragraph>
-                                    <Slider value={this.currentValue} minimumValue={5} maximumValue={120} step={5} onValueChange={this._onValueChange} />
+                                        Automatically changes bridge status <Text style={{ fontWeight: 'bold', }}>{currentValue}  min</Text> before event occurs</Paragraph>
+                                    <Slider value={currentValue} minimumValue={5} maximumValue={120} step={5} onValueChange={this._onValueChange} />
                                 </Dialog.Content>
                             </View>
                         </ScrollView>
@@ -44,7 +45,7 @@ export default class extends React.Component {
                             this._setDefaultValue();
                         }}>Reset</Button>
                         <Button onPress={() => {
-                            onConfirm(this.currentValue);
+                            onConfirm(currentValue);
                         }}>Ok</Button>
                     </Dialog.Actions>
                 </Dialog>
