@@ -45,6 +45,7 @@ Project to track the DrawBridges status (up/down)
     * adb shell am start -n packagename/.MainActivity `(reopen the app)`
     * adb shell input text "word" `usefull when retype from pc`
     * npm start -- --reset-cache `reset cache`
+    * adb reverse tcp:8081 tcp:8081 `force the reverse connection from phone-pc`
 
 
 for more:
