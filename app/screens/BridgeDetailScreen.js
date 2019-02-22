@@ -15,6 +15,7 @@ import { capitalize } from '../helpers'
 import { addBridgeEvent, delBridgeEvent, addBridgeStatusThreshold } from '../actions'
 import { connect } from 'react-redux';
 import v3 from 'uuid'
+import BridgeStatus from '../components/BridgeStatus';
 
 
 // Upper case all rendered dates.
@@ -102,6 +103,7 @@ class BridgeDetailScreen extends Component {
 
                 <Card style={styles.card}>
                     <Card.Cover source={{ uri: bridge.src }} />
+                    <BridgeStatus bridge={bridge} />
                 </Card>
 
                 <Card style={styles.card}>

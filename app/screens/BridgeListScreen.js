@@ -16,6 +16,7 @@ import {
 import { Appbar, Divider, List, TouchableRipple } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { fetchbridges } from '../actions';
+import BridgeStatus from '../components/BridgeStatus';
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges }
@@ -63,14 +64,17 @@ class BridgeListScreen extends Component {
                     keyExtractor={(item, index) => `${item.id}`}
                     renderItem={({ item }) =>
                         <View>
-                            <Divider />
                             <TouchableRipple onPress={() => this._onItemListClick('Detail', { bridge: item })} style={{ padding: 4 }}>
                                 <View style={{ flex: 1, flexDirection: 'row' }}>
                                     <Image style={{ width: 100, height: 60, overflow: 'hidden', borderRadius: 10 }} source={{ uri: item.src }} />
-                                    <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap", paddingHorizontal: 4, flexGrow: 2 }}>{_capitalize(item.name)}</Text>
+                                    <View style={{ flex: 1, flexDirection: 'column', flexGrow: 2, paddingHorizontal: 4 }}>
+                                        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap" }}>{_capitalize(item.name)}</Text>
+                                        <BridgeStatus bridge={item} />
+                                    </View>
                                     <List.Icon icon="keyboard-arrow-right" />
                                 </View>
                             </TouchableRipple>
+                            <Divider />
                         </View>
                     }
                 />
