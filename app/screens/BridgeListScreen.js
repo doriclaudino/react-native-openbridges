@@ -9,14 +9,17 @@ import {
     StyleSheet,
     View,
     Text,
-    Button,
     FlatList,
-    Image
+    Image,
+    Slider
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple, Button } from 'react-native-paper';
 import { connect } from 'react-redux';
 import { fetchbridges } from '../actions';
 import BridgeStatus from '../components/BridgeStatus';
+import Entypo from 'react-native-vector-icons/Entypo'
+import SliderAppbar from '../components/SliderAppbar';
+import SearchAppbar from '../components/SearchAppbar';
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges }
@@ -31,6 +34,11 @@ const _capitalize = (string) => {
 class BridgeListScreen extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            selectedDistance: 10,
+            isSearchBarVisible: false,
+            isSliderLocationVisible: false
+        }
     }
 
     componentDidMount = () => {
@@ -38,15 +46,73 @@ class BridgeListScreen extends Component {
     }
 
     static navigationOptions = ({ navigation }) => {
+        const { params } = navigation.state;
+        if (params.isSearchBarVisible) {
+            return ({
+                header: (
+                    <SearchAppbar
+                        onBlur={params.onSearchClick}
+                        onChangeText={(text) => { params.onSearchBarChangeText(text); }}
+                        value={params.searchBarTextValue}
+                        onIconPress={params.onSearchClick}
+                    />
+                )
+            })
+        } else if (params.isSliderLocationVisible) {
+            return ({
+                header: (
+                    <SliderAppbar
+                        onCancelClick={params.onFilterLocationClick}
+                        disabled={!params.onDistanceChange}
+                        onValueChange={params.onDistanceChange}
+                        value={params.selectedDistance}
+                        suffix={' miles away'}
+                        showTitle={true}
+                    />)
+            })
+        }
+
         return ({
             header: (
                 <Appbar.Header>
                     <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
                     <Appbar.Content title={navigation.getParam('title', 'default')} />
+                    < Appbar.Action disabled={!params.onSearchClick} icon="search" onPress={() => { if (params) { params.onSearchClick() } }} />
+                    < Appbar.Action disabled={!params.onFilterLocationClick} icon={() => <Entypo name="ruler" size={24} color="white" />} onPress={() => { params.onFilterLocationClick() }} />
                 </Appbar.Header>
             )
         })
     };
+
+    componentWillMount = () => {
+        this.props.navigation.setParams({
+            onSearchBarChangeText: text => console.log(text),
+            isSearchBarVisible: this.state.isSearchBarVisible,
+            onSearchClick: this._flagSearchbarVisible,
+
+            onFilterLocationClick: this._onFilterLocationClick,
+            selectedDistance: this.state.selectedDistance,
+            onDistanceChange: this._onDistanceChange,
+            isSliderLocationVisible: this.state.isSliderLocationVisible,
+        })
+    }
+
+    _onDistanceChange = (selectedDistance) => {
+        this.setState({ selectedDistance })
+        this.props.navigation.setParams({ selectedDistance })
+    }
+
+    _onFilterLocationClick = () => {
+        this.props.navigation.setParams({
+            isSliderLocationVisible: !this.props.navigation.state.params.isSliderLocationVisible
+        })
+    }
+
+    _flagSearchbarVisible = () => {
+        this.props.navigation.setParams({
+            isSearchBarVisible: !this.props.navigation.state.params.isSearchBarVisible
+        })
+    }
 
     _onItemListClick = (navigateTo, item) => {
         this.props.navigation.navigate(navigateTo, item);
@@ -78,6 +144,7 @@ class BridgeListScreen extends Component {
                         </View>
                     }
                 />
+                <Button onPress={this._flagSearchbarVisible}>SEARCHBAR</Button>
             </View>
         )
     }
