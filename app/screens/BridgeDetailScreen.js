@@ -11,7 +11,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import Moment from 'react-moment';
 import DialogSlider from '../components/DialogSlider';
 import DialogRadioButton from '../components/DialogRadioButton';
-import { capitalize } from '../helpers'
+import { capitalizeSentence } from '../helpers'
 import { addBridgeEvent, delBridgeEvent, addBridgeStatusThreshold } from '../actions'
 import { connect } from 'react-redux';
 import v3 from 'uuid'
@@ -49,7 +49,7 @@ class BridgeDetailScreen extends Component {
             header: (
                 <Appbar.Header>
                     <Appbar.BackAction onPress={() => navigation.goBack()} />
-                    <Appbar.Content title={capitalize(navigation.state.params.bridge.name)} />
+                    <Appbar.Content title={capitalizeSentence(navigation.state.params.bridge.name)} />
                     <Appbar.Action icon="settings" disabled={!navigation.state.params.onDialogSliderClick} onPress={() => { navigation.state.params.onDialogSliderClick() }} />
                 </Appbar.Header>
             )

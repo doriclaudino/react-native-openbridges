@@ -20,7 +20,7 @@ import BridgeStatus from '../components/BridgeStatus';
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
-import { capitalizeSentence } from '../helpers'
+import { capitalizeSentence, filterNameAndLocation } from '../helpers'
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges }
@@ -33,6 +33,10 @@ class BridgeListScreen extends Component {
         super(props);
         this.state = {
             selectedDistance: 10,
+            currentUserLocation: {
+                lat: 42.3863,
+                lng: -71.0227
+            },
             isSearchBarVisible: false,
             isSliderLocationVisible: false
         }
@@ -59,6 +63,7 @@ class BridgeListScreen extends Component {
             return ({
                 header: (
                     <SliderAppbar
+                        onSlidingComplete={params.onFilterLocationClick}
                         onCancelClick={params.onFilterLocationClick}
                         disabled={!params.onDistanceChange}
                         onValueChange={params.onDistanceChange}
@@ -124,7 +129,9 @@ class BridgeListScreen extends Component {
 
 
     render() {
-        filteredBridges = this.props.bridges
+        const { searchBarValue } = this.props.navigation.state.params
+        const { currentUserLocation, selectedDistance } = this.state
+        filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, currentUserLocation, selectedDistance))
         return (
             <View style={styles.container}>
                 <FlatList
