@@ -20,16 +20,13 @@ import BridgeStatus from '../components/BridgeStatus';
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
+import { capitalizeSentence } from '../helpers'
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges }
 }
 
 const mapDispatchToProps = { fetchbridges }
-
-const _capitalize = (string) => {
-    return string.toLowerCase().split(' ').map((a) => a.charAt(0).toUpperCase() + a.substr(1)).join(' ')
-}
 
 class BridgeListScreen extends Component {
     constructor(props) {
@@ -53,7 +50,7 @@ class BridgeListScreen extends Component {
                     <SearchAppbar
                         onBlur={params.onSearchClick}
                         onChangeText={(text) => { params.onSearchBarChangeText(text); }}
-                        value={params.searchBarTextValue}
+                        value={params.searchBarValue}
                         onIconPress={params.onSearchClick}
                     />
                 )
@@ -86,7 +83,8 @@ class BridgeListScreen extends Component {
 
     componentWillMount = () => {
         this.props.navigation.setParams({
-            onSearchBarChangeText: text => console.log(text),
+            onSearchBarChangeText: this._onSearchBarChangeText,
+            searchBarValue: null,
             isSearchBarVisible: this.state.isSearchBarVisible,
             onSearchClick: this._flagSearchbarVisible,
 
@@ -94,6 +92,12 @@ class BridgeListScreen extends Component {
             selectedDistance: this.state.selectedDistance,
             onDistanceChange: this._onDistanceChange,
             isSliderLocationVisible: this.state.isSliderLocationVisible,
+        })
+    }
+
+    _onSearchBarChangeText = (text) => {
+        this.props.navigation.setParams({
+            searchBarValue: text
         })
     }
 
@@ -134,7 +138,7 @@ class BridgeListScreen extends Component {
                                 <View style={{ flex: 1, flexDirection: 'row' }}>
                                     <Image style={{ width: 100, height: 60, overflow: 'hidden', borderRadius: 10 }} source={{ uri: item.src }} />
                                     <View style={{ flex: 1, flexDirection: 'column', flexGrow: 2, paddingHorizontal: 4 }}>
-                                        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap" }}>{_capitalize(item.name)}</Text>
+                                        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap" }}>{capitalizeSentence(item.name)}</Text>
                                         <BridgeStatus bridge={item} />
                                     </View>
                                     <List.Icon icon="keyboard-arrow-right" />
@@ -144,7 +148,6 @@ class BridgeListScreen extends Component {
                         </View>
                     }
                 />
-                <Button onPress={this._flagSearchbarVisible}>SEARCHBAR</Button>
             </View>
         )
     }

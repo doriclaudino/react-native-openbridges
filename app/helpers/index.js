@@ -18,6 +18,6 @@ export const parseToArrayWithId = (obj) => {
         return []
 }
 
-export const capitalize = (string) => {
-    return string.toLowerCase().split(' ').map((a) => a.charAt(0).toUpperCase() + a.substr(1)).join(' ')
+export const capitalizeSentence = (sentence) => {
+    return sentence.toLowerCase().split(' ').map((a) => a.charAt(0).toUpperCase() + a.substr(1)).join(' ')
 }
