@@ -12,20 +12,10 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
 import BridgeListScreen from './app/screens/BridgeListScreen';
 import BridgeDetailScreen from './app/screens/BridgeDetailScreen';
-import LoginScreen from './app/screens/LoginScreen';
 import PhoneScreen from './app/screens/PhoneScreen';
 import { Provider } from 'react-redux'
 import { store } from './app/store/BridgeStore';
 import { Provider as PaperProvider } from 'react-native-paper';
-
-const LoginStack = createStackNavigator({
-  Login: {
-    screen: LoginScreen,
-    params: {
-      title: 'Login',
-    }
-  }
-});
 
 const PhoneAuthStack = createStackNavigator({
   PhoneScreen: {
@@ -50,7 +40,6 @@ const BridgeStack = createStackNavigator({
 
 const DrawerNavigation = createDrawerNavigator({
   Bridges: BridgeStack,
-  Login: LoginStack,
   PhoneAuth: PhoneAuthStack,
 },
   {
