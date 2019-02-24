@@ -12,6 +12,7 @@
     "bug": "rimraf ./android/app/build/generated/res/google-services/debug"
   },
   "dependencies": {
+    "moment": "^2.24.0",
     "react": "16.6.3",
     "react-moment": "^0.8.4",
     "react-native": "0.58.4",
