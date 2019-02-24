@@ -15,18 +15,19 @@ import {
 } from 'react-native'
 import { Appbar, Divider, List, TouchableRipple, Button } from 'react-native-paper';
 import { connect } from 'react-redux';
-import { fetchbridges } from '../actions';
+
 import BridgeStatus from '../components/BridgeStatus';
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
 import { capitalizeSentence, filterNameAndLocation } from '../helpers'
+import { fetchbridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue } from '../actions';
 
 const mapStateToProps = (state) => {
-    return { bridges: state.bridges }
+    return { bridges: state.bridges, ui: state.ui }
 }
 
-const mapDispatchToProps = { fetchbridges }
+const mapDispatchToProps = { fetchbridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue }
 
 class BridgeListScreen extends Component {
     constructor(props) {
@@ -42,10 +43,6 @@ class BridgeListScreen extends Component {
         }
     }
 
-    componentDidMount = () => {
-        this.props.fetchbridges();
-    }
-
     static navigationOptions = ({ navigation }) => {
         const { params } = navigation.state;
         if (params.isSearchBarVisible) {
@@ -53,7 +50,7 @@ class BridgeListScreen extends Component {
                 header: (
                     <SearchAppbar
                         onBlur={params.onSearchClick}
-                        onChangeText={(text) => { params.onSearchBarChangeText(text); }}
+                        onChangeText={(text) => { params.onSearchBarChangeText(text); navigation.setParams({ searchBarValue: text }) }}
                         value={params.searchBarValue}
                         onIconPress={params.onSearchClick}
                     />
@@ -63,10 +60,12 @@ class BridgeListScreen extends Component {
             return ({
                 header: (
                     <SliderAppbar
-                        onSlidingComplete={params.onFilterLocationClick}
                         onCancelClick={params.onFilterLocationClick}
                         disabled={!params.onDistanceChange}
-                        onValueChange={params.onDistanceChange}
+                        onValueChange={(value) => {
+                            params.onDistanceChange(value);
+                            navigation.setParams({ selectedDistance: value });
+                        }}
                         value={params.selectedDistance}
                         suffix={' miles away'}
                         showTitle={true}
@@ -86,29 +85,37 @@ class BridgeListScreen extends Component {
         })
     };
 
-    componentWillMount = () => {
+
+    componentWillReceiveProps({ ui }) {
+        if (this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance
+            && ui.selectedDistance) {
+            this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
+        }
+
+        if (this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue
+            && ui.searchBarValue) {
+            this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
+        }
+    }
+
+    componentDidMount = () => {
+        this.props.fetchbridges();
+        this.props.watchUserUpdateUI();
+
         this.props.navigation.setParams({
             onSearchBarChangeText: this._onSearchBarChangeText,
-            searchBarValue: null,
-            isSearchBarVisible: this.state.isSearchBarVisible,
             onSearchClick: this._flagSearchbarVisible,
-
-            onFilterLocationClick: this._onFilterLocationClick,
-            selectedDistance: this.state.selectedDistance,
             onDistanceChange: this._onDistanceChange,
-            isSliderLocationVisible: this.state.isSliderLocationVisible,
+            onFilterLocationClick: this._onFilterLocationClick,
         })
     }
 
     _onSearchBarChangeText = (text) => {
-        this.props.navigation.setParams({
-            searchBarValue: text
-        })
+        this.props.updateSearchBarValue(text)
     }
 
     _onDistanceChange = (selectedDistance) => {
-        this.setState({ selectedDistance })
-        this.props.navigation.setParams({ selectedDistance })
+        this.props.updatedSelectDistance(selectedDistance)
     }
 
     _onFilterLocationClick = () => {
@@ -129,8 +136,7 @@ class BridgeListScreen extends Component {
 
 
     render() {
-        const { searchBarValue } = this.props.navigation.state.params
-        const { currentUserLocation, selectedDistance } = this.state
+        const { currentUserLocation, selectedDistance, searchBarValue } = this.props.ui
         filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, currentUserLocation, selectedDistance))
         return (
             <View style={styles.container}>

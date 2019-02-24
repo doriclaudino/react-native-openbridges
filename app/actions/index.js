@@ -63,7 +63,7 @@ export const watchUserUpdateUI = () => async dispatch => {
 export const createOrUpdateUserUI = () => async dispatch => {
     try {
         const { uid } = firebase.auth().currentUser
-        userUiRef = firebase.database().ref(`ui/${uid}`)
+        userUiRef = firebase.database().ref(`ui/`)
         const defaultUserUi = {
             selectedDistance: 10,
             currentUserLocation: {
@@ -73,13 +73,31 @@ export const createOrUpdateUserUI = () => async dispatch => {
             isSearchBarVisible: false,
             isSliderLocationVisible: false
         }
+        userUiRef.child(uid).once('value', function (snapshot) {
+            if (!snapshot.exists())
+                userUiRef.child(uid).set(defaultUserUi)
+        });
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-        userUiRef.once('value')
-            .then((snapshot) => {
-                snapshot.exists()
-                    ? dispatch(updateUserUI(snapshot.val()))
-                    : dispatch(createDefaultUserUI(defaultUserUi))
-            })
+
+export const updatedSelectDistance = (selectedDistance) => async dispatch => {
+    try {
+        const { uid } = firebase.auth().currentUser
+        distanceRef = firebase.database().ref(`ui/${uid}/selectedDistance`)
+        distanceRef.set(selectedDistance)
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const updateSearchBarValue = (text) => async dispatch => {
+    try {
+        const { uid } = firebase.auth().currentUser
+        distanceRef = firebase.database().ref(`ui/${uid}/searchBarValue`)
+        distanceRef.set(text)
     } catch (error) {
         console.error(error);
     }
