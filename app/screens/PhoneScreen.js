@@ -23,8 +23,13 @@ import Form from 'react-native-form';
 import { Appbar, Button } from 'react-native-paper';
 import CountryPicker from 'react-native-country-picker-modal';
 import firebase from 'react-native-firebase';
+import { connect } from 'react-redux';
+import { createOrUpdateUserUI } from '../actions';
 
-export default class PhoneScreen extends Component {
+
+const mapDispatchToProps = { createOrUpdateUserUI }
+
+class PhoneScreen extends Component {
 
     constructor(props) {
 
@@ -86,6 +91,7 @@ export default class PhoneScreen extends Component {
                 confirmResult.confirm(code)
                     .then((user) => {
                         Alert.alert('Success!', 'You have successfully verified your phone number', [{ text: 'OK', onPress: () => this._tryAgain() }])
+                        this.props.createOrUpdateUserUI();
                     })
                     .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => this.refs.form.refs.textInput.focus() }], { cancelable: false }));
             } else
@@ -226,6 +232,8 @@ export default class PhoneScreen extends Component {
     }
 }
 
+
+export default connect(null, mapDispatchToProps)(PhoneScreen)
 
 const MAX_LENGTH_CODE = 6;
 const MAX_LENGTH_NUMBER = 20;

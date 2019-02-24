@@ -1,6 +1,16 @@
 import firebase from 'react-native-firebase';
 import { parseToArrayWithId } from '../helpers'
 
+const createDefaultUserUI = payload => ({
+    type: 'CREATE_DEFAULT_USER_UI',
+    payload,
+});
+
+const fetchUserUI = payload => ({
+    type: 'FETCH_USER_UI',
+    payload,
+});
+
 export const addBridges = payload => ({
     type: 'ADD_BRIDGES',
     payload,
@@ -33,5 +43,44 @@ export const fetchbridges = () => async dispatch => {
     } catch (error) {
         console.error(error);
         dispatch(clearBridges());
+    }
+};
+
+export const watchUserUpdateUI = () => async dispatch => {
+    console.log('watchUserUpdateUI')
+    try {
+        const { currentUser } = firebase.auth()
+        userUiRef = firebase.database().ref(`ui/${currentUser.uid}`)
+        userUiRef.on('value', (snapshot) => {
+            dispatch(fetchUserUI(snapshot.val()))
+        });
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
+export const createOrUpdateUserUI = () => async dispatch => {
+    try {
+        const { uid } = firebase.auth().currentUser
+        userUiRef = firebase.database().ref(`ui/${uid}`)
+        const defaultUserUi = {
+            selectedDistance: 10,
+            currentUserLocation: {
+                lat: 42.3863,
+                lng: -71.0227
+            },
+            isSearchBarVisible: false,
+            isSliderLocationVisible: false
+        }
+
+        userUiRef.once('value')
+            .then((snapshot) => {
+                snapshot.exists()
+                    ? dispatch(updateUserUI(snapshot.val()))
+                    : dispatch(createDefaultUserUI(defaultUserUi))
+            })
+    } catch (error) {
+        console.error(error);
     }
 };
