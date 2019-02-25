@@ -36,9 +36,19 @@ export const clearBridges = () => ({ type: 'CLEAR_BRIDGES' });
 export const fetchbridges = () => async dispatch => {
     try {
         bridgeRef = firebase.database().ref('bridges');
+        bridgeRef.off('value')
         bridgeRef.on('value', (snapshot) => {
-            let bridges = parseToArrayWithId(snapshot.val())
-            dispatch(addBridges(bridges));
+            try {
+                list = snapshot.val();
+                keys = Object.keys(list);
+                bridges = keys.map(key => {
+                    events = parseToArrayWithId(list[key].events)
+                    return { ...list[key], id: key, events }
+                })
+                dispatch(addBridges(bridges));
+            } catch (error) {
+                console.log(error.message)
+            }
         });
     } catch (error) {
         console.error(error);
