@@ -13,11 +13,16 @@ const fetchBridgesSuccess = payload => ({
     payload,
 });
 
-export const addBridgeStatusThreshold = payload => ({
-    type: ActionTypes.ADD_BRIDGE_STATUS_THRESHOLD,
-    payload,
-});
-
+export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async dispatch => {
+    try {
+        console.log('addBridgeStatusThreshold')
+        firebase.database()
+            .ref(`bridges/${bridge.id}/statusThreshold`)
+            .set(statusThreshold)
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 export const delBridgeEvent = ({ bridge, event }) => async dispatch => {
     try {
