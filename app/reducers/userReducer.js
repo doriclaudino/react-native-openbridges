@@ -1,11 +1,13 @@
+import ActionTypes from '../actions'
+
 export const userReducer = (state = [], action) => {
-    console.log(action)
+    console.log('userReducer', action)
     switch (action.type) {
-        case 'FETCH_USER_UI':
+        case ActionTypes.FETCH_UI_SUCCESS:
             return action.payload;
-        case 'CREATE_DEFAULT_USER_UI':
+        case ActionTypes.CREATE_DEFAULT_USER_UI:
             return action.payload;
-        case 'UPDATE_SELECTED_DISTANCE':
+        case ActionTypes.UPDATE_SELECTED_DISTANCE:
             return { ...state, selectedDistance: action.payload };
         default:
             return {};

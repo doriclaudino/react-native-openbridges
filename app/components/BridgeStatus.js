@@ -64,7 +64,7 @@ export default class extends React.Component {
 
     filterNextEvent = (bridge) => {
         statusThreshold = bridge.statusThreshold || 10;
-        nextEvent = bridge.events.filter(event => new Date() <= new Date(event.when)).sort((a, b) => { return new Date(a.when) - new Date(b.when); })[0] || undefined
+        nextEvent = bridge.events.filter(event => event && new Date() <= new Date(event.when)).sort((a, b) => { return new Date(a.when) - new Date(b.when); })[0] || undefined
         if (nextEvent) {
             let when = nextEvent.when
             if (this.canChangeStatus(statusThreshold, nextEvent)) {
@@ -79,7 +79,7 @@ export default class extends React.Component {
 
     filterLastEvent = (bridge) => {
         statusThreshold = bridge.statusThreshold || 10;
-        lastEvent = bridge.events.filter(event => new Date() > new Date(event.when)).sort((a, b) => { return new Date(b.when) - new Date(a.when); })[0] || undefined
+        lastEvent = bridge.events.filter(event => event && new Date() > new Date(event.when)).sort((a, b) => { return new Date(b.when) - new Date(a.when); })[0] || undefined
         if (lastEvent) {
             let when = lastEvent.when
             if (lastEvent) {
@@ -96,6 +96,9 @@ export default class extends React.Component {
 
     getBridgeStatus = (bridge) => {
         try {
+            if (!bridge.events)
+                return new UnkownStatus()
+
             nextEvent = this.filterNextEvent(bridge)
             if (nextEvent)
                 return nextEvent
@@ -120,7 +123,6 @@ export default class extends React.Component {
         return (
             <Card.Content style={{ backgroundColor: showStatus.color, paddingBottom: 0 }}>
                 <Text>
-
                     {showStatus.status}
                     {showStatus.when &&
                         <Moment element={Text} fromNow>

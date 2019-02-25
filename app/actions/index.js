@@ -1,51 +1,50 @@
 import firebase from 'react-native-firebase';
 import { parseToArrayWithId } from '../helpers'
+import ActionTypes from './ActionTypes'
+export default ActionTypes
 
-const createDefaultUserUI = payload => ({
-    type: 'CREATE_DEFAULT_USER_UI',
+const fetchUISuccess = payload => ({
+    type: ActionTypes.FETCH_UI_SUCCESS,
     payload,
 });
 
-const fetchUserUI = payload => ({
-    type: 'FETCH_USER_UI',
-    payload,
-});
-
-export const addBridges = payload => ({
-    type: 'ADD_BRIDGES',
+const fetchBridgesSuccess = payload => ({
+    type: ActionTypes.FETCH_BRIDGES_SUCCESS,
     payload,
 });
 
 export const addBridgeStatusThreshold = payload => ({
-    type: 'ADD_BRIDGE_STATUS_THRESHOLD',
+    type: ActionTypes.ADD_BRIDGE_STATUS_THRESHOLD,
     payload,
 });
 
-export const delBridgeEvent = (payload) => ({
-    type: 'DEL_BRIDGE_EVENT',
-    payload,
-});
 
-export const addBridgeEvent = (payload) => ({
-    type: 'ADD_BRIDGE_EVENT',
-    payload,
-});
+export const delBridgeEvent = ({ bridge, event }) => async dispatch => {
+    try {
+        console.log('delBridgeEvent')
+        firebase.database().ref(`bridges/${bridge.id}/events`).remove(event.id)
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-export const clearBridges = () => ({ type: 'CLEAR_BRIDGES' });
+export const addBridgeEvent = ({ bridge, event }) => async dispatch => {
+    try {
+        console.log('addBridgeEvent')
+        firebase.database().ref(`bridges/${bridge.id}/events`).push(event)
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 export const fetchbridges = () => async dispatch => {
     try {
+        console.log('fetchbridges')
         bridgeRef = firebase.database().ref('bridges');
         bridgeRef.off('value')
         bridgeRef.on('value', (snapshot) => {
             try {
-                list = snapshot.val();
-                keys = Object.keys(list);
-                bridges = keys.map(key => {
-                    events = parseToArrayWithId(list[key].events)
-                    return { ...list[key], id: key, events }
-                })
-                dispatch(addBridges(bridges));
+                dispatch(fetchBridgesSuccess(snapshot.val()));
             } catch (error) {
                 console.log(error.message)
             }
@@ -56,13 +55,18 @@ export const fetchbridges = () => async dispatch => {
     }
 };
 
-export const watchUserUpdateUI = () => async dispatch => {
-    console.log('watchUserUpdateUI')
+export const clearBridges = () => ({
+    type: ActionTypes.CLEAR_BRIDGES
+});
+
+export const fetchUI = () => async dispatch => {
+    console.log('fetchUI')
     try {
         const { currentUser } = firebase.auth()
         userUiRef = firebase.database().ref(`ui/${currentUser.uid}`)
+        userUiRef.off('value')
         userUiRef.on('value', (snapshot) => {
-            dispatch(fetchUserUI(snapshot.val()))
+            dispatch(fetchUISuccess(snapshot.val()))
         });
     } catch (error) {
         console.error(error);

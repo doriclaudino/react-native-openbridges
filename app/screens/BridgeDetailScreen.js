@@ -14,7 +14,6 @@ import DialogRadioButton from '../components/DialogRadioButton';
 import { capitalizeSentence } from '../helpers'
 import { addBridgeEvent, delBridgeEvent, addBridgeStatusThreshold } from '../actions'
 import { connect } from 'react-redux';
-import v3 from 'uuid'
 import BridgeStatus from '../components/BridgeStatus';
 
 
@@ -146,7 +145,7 @@ class BridgeDetailScreen extends Component {
     _handleDateTimePicker = (date) => {
         this.setState({ selectedDateTime: date });
         this._flagDateTimePicker();
-        this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date, id: v3() } })
+        this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date } })
     };
 
     _handleDialogSlider = (newThreshold) => {
