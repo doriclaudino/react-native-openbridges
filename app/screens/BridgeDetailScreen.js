@@ -146,7 +146,7 @@ class BridgeDetailScreen extends Component {
     _handleDateTimePicker = (date) => {
         this.setState({ selectedDateTime: date });
         this._flagDateTimePicker();
-        this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date, id: v3() } })
+        this.props.addBridgeEvent({ bridge: this.props.bridge, event: { status: this.state.selectedStatus, when: date } })
     };
 
     _handleDialogSlider = (newThreshold) => {

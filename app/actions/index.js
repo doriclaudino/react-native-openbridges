@@ -1,50 +1,50 @@
 import firebase from 'react-native-firebase';
 import { parseToArrayWithId } from '../helpers'
+import ActionTypes from './ActionTypes'
+export default ActionTypes
 
 const createDefaultUserUI = payload => ({
-    type: 'CREATE_DEFAULT_USER_UI',
+    type: ActionTypes.CREATE_DEFAULT_USER_UI,
     payload,
 });
 
 const fetchUserUI = payload => ({
-    type: 'FETCH_USER_UI',
+    type: ActionTypes.FETCH_USER_UI,
     payload,
 });
 
-export const addBridges = payload => ({
-    type: 'ADD_BRIDGES',
+export const fetchBridgesSuccess = payload => ({
+    type: ActionTypes.FETCH_BRIDGES_SUCCESS,
     payload,
+});
+
+export const fetchBridges = () => ({
+    type: ActionTypes.FETCH_BRIDGES,
 });
 
 export const addBridgeStatusThreshold = payload => ({
-    type: 'ADD_BRIDGE_STATUS_THRESHOLD',
+    type: ActionTypes.ADD_BRIDGE_STATUS_THRESHOLD,
     payload,
 });
 
 export const delBridgeEvent = (payload) => ({
-    type: 'DEL_BRIDGE_EVENT',
+    type: ActionTypes.DEL_BRIDGE_EVENT,
     payload,
 });
 
 export const addBridgeEvent = (payload) => ({
-    type: 'ADD_BRIDGE_EVENT',
+    type: ActionTypes.ADD_BRIDGE_EVENT,
     payload,
 });
 
-export const clearBridges = () => ({ type: 'CLEAR_BRIDGES' });
+export const addBridgeEventSuccess = (payload) => ({
+    type: ActionTypes.ADD_BRIDGE_EVENT_SUCCESS,
+    payload,
+});
 
-export const fetchbridges = () => async dispatch => {
-    try {
-        bridgeRef = firebase.database().ref('bridges');
-        bridgeRef.on('value', (snapshot) => {
-            let bridges = parseToArrayWithId(snapshot.val())
-            dispatch(addBridges(bridges));
-        });
-    } catch (error) {
-        console.error(error);
-        dispatch(clearBridges());
-    }
-};
+export const clearBridges = () => ({
+    type: ActionTypes.CLEAR_BRIDGES
+});
 
 export const watchUserUpdateUI = () => async dispatch => {
     console.log('watchUserUpdateUI')

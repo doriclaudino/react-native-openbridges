@@ -120,7 +120,6 @@ export default class extends React.Component {
 
     render() {
         const showStatus = this.getBridgeStatus(this.props.bridge)
-        console.log({ showStatus })
         return (
             <Card.Content style={{ backgroundColor: showStatus.color, paddingBottom: 0 }}>
                 <Text>

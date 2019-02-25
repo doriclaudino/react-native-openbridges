@@ -21,13 +21,13 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
 import { capitalizeSentence, filterNameAndLocation } from '../helpers'
-import { fetchbridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue } from '../actions';
+import { fetchBridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue } from '../actions';
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges, ui: state.ui }
 }
 
-const mapDispatchToProps = { fetchbridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue }
+const mapDispatchToProps = { fetchBridges, watchUserUpdateUI, updatedSelectDistance, updateSearchBarValue }
 
 class BridgeListScreen extends Component {
     constructor(props) {
@@ -99,8 +99,9 @@ class BridgeListScreen extends Component {
     }
 
     componentDidMount = () => {
-        this.props.fetchbridges();
-        this.props.watchUserUpdateUI();
+        console.log(this.props)
+        this.props.fetchBridges();
+        //this.props.watchUserUpdateUI();
 
         this.props.navigation.setParams({
             onSearchBarChangeText: this._onSearchBarChangeText,
