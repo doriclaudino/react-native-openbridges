@@ -25,6 +25,7 @@ import CountryPicker from 'react-native-country-picker-modal';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
 import { createOrUpdateUserUI } from '../actions';
+import { LoginButton, AccessToken } from 'react-native-fbsdk';
 
 
 const mapDispatchToProps = { createOrUpdateUserUI }
@@ -40,7 +41,8 @@ class PhoneScreen extends Component {
             country: {
                 cca2: 'US',
                 callingCode: '1'
-            }
+            },
+            loggedUser: null
         };
     }
 
@@ -176,7 +178,6 @@ class PhoneScreen extends Component {
     }
 
     render() {
-
         let headerText = `What's your ${this.state.enterCode ? 'verification code' : 'phone number'}?`
         let buttonText = this.state.enterCode ? 'Verify confirmation code' : 'Send confirmation code';
         let textStyle = this.state.enterCode ? {
@@ -226,9 +227,48 @@ class PhoneScreen extends Component {
                     <Button mode="contained" style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} color="#744BAC" onPress={this._getSubmitAction}>{buttonText}</Button>
                     {this._renderFooter()}
                 </Form>
+                <Text>{JSON.stringify(this.state.loggedUser)}</Text>
+                <LoginButton
+                    onLoginFinished={
+                        (error, result) => {
+                            if (error) {
+                                console.log("login has error: " + result.error);
+                            } else if (result.isCancelled) {
+                                console.log("login is cancelled.");
+                            } else {
+                                AccessToken.getCurrentAccessToken().then(
+                                    (data) => {
+                                        const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken)
+                                        if (firebase.auth().currentUser) {
+                                            firebase.auth().currentUser.linkAndRetrieveDataWithCredential(credential)
+                                                .then((ok) => console.log(ok), (err) => console.log(err))
+                                        } else {
+                                            firebase.auth().signInWithCredential(credential)
+                                                .then((ok) => console.log(ok), (err) => console.log(err))
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    onLogoutFinished={() => {
+                        console.log("logout.");
+                        this._signOutUserFirebase();
+                    }} />
+                <Button onPress={this._signOutUserFirebase}>LOGOUT FIREBASE</Button>
             </View>
-
         );
+    }
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged(() => this.setState({ loggedUser: firebase.auth().currentUser }))
+    }
+
+    _signOutUserFirebase = async () => {
+        try {
+            await firebase.auth().signOut();
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 

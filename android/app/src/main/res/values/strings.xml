@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">openbridges</string>
+    <string name="facebook_app_id">631693113952903</string> 
+    <string name="fb_login_protocol_scheme">fb631693113952903</string>
 </resources>
