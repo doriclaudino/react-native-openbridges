@@ -13,6 +13,19 @@ const fetchBridgesSuccess = payload => ({
     payload,
 });
 
+export const setCurrentUserLocation = (currentUserLocation) => async dispatch => {
+    try {
+        const { currentUser } = firebase.auth()
+
+        if (currentUser || currentUserLocation)
+            firebase.database()
+                .ref(`ui/${currentUser.uid}/currentUserLocation`)
+                .set(currentUserLocation)
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async dispatch => {
     try {
         console.log('addBridgeStatusThreshold')

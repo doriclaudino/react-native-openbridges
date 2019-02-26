@@ -21,13 +21,14 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
 import { capitalizeSentence, filterNameAndLocation } from '../helpers'
-import { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue } from '../actions';
+import { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation } from '../actions';
+import { PermissionsAndroid } from 'react-native';
 
 const mapStateToProps = (state) => {
     return { bridges: state.bridges, ui: state.ui }
 }
 
-const mapDispatchToProps = { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue }
+const mapDispatchToProps = { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
 
 class BridgeListScreen extends Component {
     constructor(props) {
@@ -122,6 +123,8 @@ class BridgeListScreen extends Component {
         this.props.navigation.setParams({
             isSliderLocationVisible: !this.props.navigation.state.params.isSliderLocationVisible
         })
+        this._saveCurrentUserLocation()
+
     }
 
     _flagSearchbarVisible = () => {
@@ -134,10 +137,31 @@ class BridgeListScreen extends Component {
         this.props.navigation.navigate(navigateTo, item);
     }
 
+    _saveCurrentUserLocation = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, null);
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                navigator.
+                    geolocation.getCurrentPosition((pos) => this.props.setCurrentUserLocation(pos),
+                        (error) => console.log(error))
+            } else {
+                console.log('ACCESS_FINE_LOCATION permission denied');
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    }
 
     render() {
         const { currentUserLocation, selectedDistance, searchBarValue } = this.props.ui
-        filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, currentUserLocation, selectedDistance))
+
+        mapUserLocation = {}
+        if (currentUserLocation) {
+            mapUserLocation.lat = currentUserLocation.coords.latitude
+            mapUserLocation.lng = currentUserLocation.coords.longitude
+        }
+
+        filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, mapUserLocation, selectedDistance))
         return (
             <View style={styles.container}>
                 <FlatList
@@ -161,6 +185,7 @@ class BridgeListScreen extends Component {
                         </View>
                     }
                 />
+                <Button onPress={this._requesGPS}>GPS</Button>
             </View>
         )
     }
