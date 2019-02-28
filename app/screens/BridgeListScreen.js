@@ -185,7 +185,6 @@ class BridgeListScreen extends Component {
                         </View>
                     }
                 />
-                <Button onPress={this._requesGPS}>GPS</Button>
             </View>
         )
     }
