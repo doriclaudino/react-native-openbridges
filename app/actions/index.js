@@ -40,7 +40,7 @@ export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async d
 export const delBridgeEvent = ({ bridge, event }) => async dispatch => {
     try {
         console.log('delBridgeEvent')
-        firebase.database().ref(`bridges/${bridge.id}/events`).remove(event.id)
+        firebase.database().ref(`bridges/${bridge.id}/events/${event.id}`).remove()
     } catch (error) {
         console.error(error);
     }
