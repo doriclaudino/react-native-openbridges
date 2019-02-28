@@ -25,7 +25,8 @@ import CountryPicker from 'react-native-country-picker-modal';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
 import { createOrUpdateUserUI } from '../actions';
-import { LoginButton, AccessToken } from 'react-native-fbsdk';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+
 
 
 const mapDispatchToProps = { createOrUpdateUserUI }
@@ -47,14 +48,9 @@ class PhoneScreen extends Component {
     }
 
     static navigationOptions = ({ navigation }) => {
-        return ({
-            header: (
-                <Appbar.Header>
-                    <Appbar.Action icon="menu" onPress={() => { Keyboard.dismiss(); navigation.openDrawer(); }} />
-                    <Appbar.Content title={navigation.getParam('title', 'default')} />
-                </Appbar.Header>
-            )
-        })
+        return {
+            title: navigation.getParam('title', 'Phone Sign-in')
+        }
     };
 
     _getCode = () => {
@@ -92,10 +88,10 @@ class PhoneScreen extends Component {
             if (confirmResult) {
                 confirmResult.confirm(code)
                     .then((user) => {
-                        Alert.alert('Success!', 'You have successfully verified your phone number', [{ text: 'OK', onPress: () => this._tryAgain() }])
+                        Alert.alert('Success!', 'You have successfully verified your phone number', [{ text: 'OK' }])
                         this.props.createOrUpdateUserUI();
                     })
-                    .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => this.refs.form.refs.textInput.focus() }], { cancelable: false }));
+                    .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => { this && this.refs.form.refs.textInput.focus() } }], { cancelable: false }));
             } else
                 this.setState({ spinner: false });
         } catch (err) {
@@ -224,51 +220,11 @@ class PhoneScreen extends Component {
                         />
                     </View>
                     {/**add-a-photo icon use the same color of the button just to make a fake space to ActivityIcon */}
-                    <Button mode="contained" style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} color="#744BAC" onPress={this._getSubmitAction}>{buttonText}</Button>
+                    <Button mode="contained" style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} color="#744BAC">{buttonText}</Button>
                     {this._renderFooter()}
                 </Form>
-                <Text>{JSON.stringify(this.state.loggedUser)}</Text>
-                <LoginButton
-                    onLoginFinished={
-                        (error, result) => {
-                            if (error) {
-                                console.log("login has error: " + result.error);
-                            } else if (result.isCancelled) {
-                                console.log("login is cancelled.");
-                            } else {
-                                AccessToken.getCurrentAccessToken().then(
-                                    (data) => {
-                                        const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken)
-                                        if (firebase.auth().currentUser) {
-                                            firebase.auth().currentUser.linkAndRetrieveDataWithCredential(credential)
-                                                .then((ok) => console.log(ok), (err) => console.log(err))
-                                        } else {
-                                            firebase.auth().signInWithCredential(credential)
-                                                .then((ok) => console.log(ok), (err) => console.log(err))
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    onLogoutFinished={() => {
-                        console.log("logout.");
-                        this._signOutUserFirebase();
-                    }} />
-                <Button onPress={this._signOutUserFirebase}>LOGOUT FIREBASE</Button>
             </View>
         );
-    }
-    componentDidMount() {
-        firebase.auth().onAuthStateChanged(() => this.setState({ loggedUser: firebase.auth().currentUser }))
-    }
-
-    _signOutUserFirebase = async () => {
-        try {
-            await firebase.auth().signOut();
-        } catch (e) {
-            console.log(e);
-        }
     }
 }
 

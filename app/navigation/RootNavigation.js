@@ -1,7 +1,9 @@
-import { createStackNavigator, createAppContainer, createDrawerNavigator } from "react-navigation";
+import { createStackNavigator, createAppContainer, createDrawerNavigator, createSwitchNavigator } from "react-navigation";
 import BridgeListScreen from '../screens/BridgeListScreen';
 import BridgeDetailScreen from '../screens/BridgeDetailScreen';
 import PhoneScreen from '../screens/PhoneScreen';
+import SignInScreen from '../screens/SignInScreen';
+import SignOutScreen from '../screens/SignOutScreen';
 
 const PhoneAuthStack = createStackNavigator({
     PhoneScreen: {
@@ -26,10 +28,45 @@ const BridgeStack = createStackNavigator({
 
 const DrawerNavigation = createDrawerNavigator({
     Bridges: BridgeStack,
-    PhoneAuth: PhoneAuthStack,
+    SignOut: SignOutScreen,
 },
     {
         initialRouteName: 'Bridges'
     });
 
-export default createAppContainer(DrawerNavigation);
+const AuthStack = createStackNavigator({
+    SignInOptions: {
+        screen: SignInScreen,
+        params: {
+            title: 'Sign-in',
+        }
+    },
+    PhoneSignIn: {
+        screen: PhoneScreen,
+        params: {
+            title: 'Phone Sign-in',
+        }
+    }
+},
+    {
+        initialRouteName: 'SignInOptions',
+        defaultNavigationOptions: {
+            title: 'Sign-In',
+            headerStyle: {
+                backgroundColor: '#6200ee',
+            },
+            headerTintColor: '#fff',
+        }
+    });
+
+const switchNav = createSwitchNavigator(
+    {
+        App: DrawerNavigation,
+        Auth: AuthStack,
+    },
+    {
+        initialRouteName: 'Auth',
+    }
+);
+
+export default createAppContainer(switchNav);
