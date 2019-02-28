@@ -220,7 +220,7 @@ class PhoneScreen extends Component {
                         />
                     </View>
                     {/**add-a-photo icon use the same color of the button just to make a fake space to ActivityIcon */}
-                    <Button mode="contained" style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} color="#744BAC">{buttonText}</Button>
+                    <Button mode="contained" disabled={this.state.spinner} style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} onPress={this._getSubmitAction} color="#744BAC">{buttonText}</Button>
                     {this._renderFooter()}
                 </Form>
             </View>
