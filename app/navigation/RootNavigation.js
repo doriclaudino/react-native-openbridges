@@ -1,9 +1,11 @@
+import React, { Component } from 'react'
 import { createStackNavigator, createAppContainer, createDrawerNavigator, createSwitchNavigator } from "react-navigation";
 import BridgeListScreen from '../screens/BridgeListScreen';
 import BridgeDetailScreen from '../screens/BridgeDetailScreen';
 import PhoneScreen from '../screens/PhoneScreen';
 import SignInScreen from '../screens/SignInScreen';
-import SignOutScreen from '../screens/SignOutScreen';
+import CustomDrawerRender from '../components/DrawerWithLogoutButton'
+
 
 const PhoneAuthStack = createStackNavigator({
     PhoneScreen: {
@@ -28,10 +30,10 @@ const BridgeStack = createStackNavigator({
 
 const DrawerNavigation = createDrawerNavigator({
     Bridges: BridgeStack,
-    SignOut: SignOutScreen,
 },
     {
-        initialRouteName: 'Bridges'
+        initialRouteName: 'Bridges',
+        contentComponent: (props) => <CustomDrawerRender {...props} />
     });
 
 const AuthStack = createStackNavigator({
