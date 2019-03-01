@@ -92,22 +92,28 @@ export const fetchUI = () => async dispatch => {
 };
 
 
-export const createOrUpdateUserUI = () => async dispatch => {
+const defaultUISchema = {
+    currentUserLocation: {
+        coords: {
+            latitude: 42.4115301,
+            longitude: -71.0649686,
+        },
+        mocked: true,
+        timestamp: 1551398273503
+    },
+    selectedDistance: 10,
+    isSearchBarVisible: false,
+    isSliderLocationVisible: false,
+    searchBarValue: ''
+}
+
+export const createUserUI = () => async dispatch => {
     try {
         const { uid } = firebase.auth().currentUser
-        userUiRef = firebase.database().ref(`ui/`)
-        const defaultUserUi = {
-            selectedDistance: 10,
-            currentUserLocation: {
-                lat: 42.3863,
-                lng: -71.0227
-            },
-            isSearchBarVisible: false,
-            isSliderLocationVisible: false
-        }
-        userUiRef.child(uid).once('value', function (snapshot) {
+        userUiRef = firebase.database().ref(`ui/${uid}`)
+        userUiRef.once('value', function (snapshot) {
             if (!snapshot.exists())
-                userUiRef.child(uid).set(defaultUserUi)
+                userUiRef.set(defaultUISchema)
         });
     } catch (error) {
         console.error(error);

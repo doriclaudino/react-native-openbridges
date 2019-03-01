@@ -3,8 +3,12 @@ import { View, } from 'react-native'
 import { Appbar, Button } from 'react-native-paper';
 import { LoginButton, AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
+import { connect } from 'react-redux';
+import { createUserUI } from '../actions';
 
-export default class SignInScreen extends React.Component {
+const mapDispatchToProps = { createUserUI }
+
+class SignInScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         return ({
             header: (
@@ -25,8 +29,11 @@ export default class SignInScreen extends React.Component {
         LoginManager.logOut();
 
         this.unsubscribe = firebase.auth().onAuthStateChanged(() => {
-            if (firebase.auth().currentUser)
-                this.props.navigation.navigate('App')
+            if (firebase.auth().currentUser) {
+                this.props.createUserUI()
+                    .then(() => this.props.navigation.navigate('App'))
+
+            }
             else
                 this.props.navigation.navigate('Auth')
         })
@@ -71,3 +78,5 @@ export default class SignInScreen extends React.Component {
         );
     }
 }
+
+export default connect(null, mapDispatchToProps)(SignInScreen)

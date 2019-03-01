@@ -13,7 +13,7 @@ import {
     Image,
     Slider
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple, Button } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator } from 'react-native-paper';
 import { connect } from 'react-redux';
 
 import BridgeStatus from '../components/BridgeStatus';
@@ -25,7 +25,10 @@ import { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, set
 import { PermissionsAndroid } from 'react-native';
 
 const mapStateToProps = (state) => {
-    return { bridges: state.bridges, ui: state.ui }
+    loading = true
+    if (state.ui && state.bridges && state.bridges.length)
+        loading = false
+    return { bridges: state.bridges, ui: state.ui, loading }
 }
 
 const mapDispatchToProps = { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
@@ -33,15 +36,8 @@ const mapDispatchToProps = { fetchbridges, fetchUI, updatedSelectDistance, updat
 class BridgeListScreen extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            selectedDistance: 10,
-            currentUserLocation: {
-                lat: 42.3863,
-                lng: -71.0227
-            },
-            isSearchBarVisible: false,
-            isSliderLocationVisible: false
-        }
+        gpsListener = {}
+        listenerTimeout = {}
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -80,29 +76,53 @@ class BridgeListScreen extends Component {
                     <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
                     <Appbar.Content title={navigation.getParam('title', 'default')} />
                     < Appbar.Action disabled={!params.onSearchClick} icon="search" onPress={() => { if (params) { params.onSearchClick() } }} />
-                    < Appbar.Action disabled={!params.onFilterLocationClick} icon={() => <Entypo name="ruler" size={24} color="white" />} onPress={() => { params.onFilterLocationClick() }} />
+                    < Appbar.Action disabled={!params.onFilterLocationClick || !params.currentUserLocation} icon={() => <Entypo name="ruler" size={24} color="white" />} onPress={() => { params.onFilterLocationClick() }} />
                 </Appbar.Header>
             )
         })
     };
 
 
-    componentWillReceiveProps({ ui }) {
-        if (this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance
-            && ui.selectedDistance) {
-            this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
-        }
+    componentWillReceiveProps({ ui, loading }) {
+        if (!loading) {
+            if (this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance
+                && ui.selectedDistance) {
+                this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
+            }
 
-        if (this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue
-            && ui.searchBarValue) {
-            this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
+            if (this.props.navigation.getParam('currentUserLocation') !== ui.currentUserLocation) {
+                this.props.navigation.setParams({ currentUserLocation: ui.currentUserLocation });
+            }
+
+            if (this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue
+                && ui.searchBarValue) {
+                this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
+            }
         }
     }
 
-    componentDidMount = () => {
+
+    _errorPosition = (error) => {
+        navigator.geolocation.clearWatch(this.gpsListener)
+        this.listenerTimeout = setTimeout(() => this._requestCurrentUserLocation(), 15000)
+    }
+
+    _sucessPosition = (pos) => {
+        this.props.setCurrentUserLocation(pos)
+    }
+
+    componentWillUnmount = () => {
+        navigator.geolocation.clearWatch(this.gpsListener)
+        clearTimeout(this.listenerTimeout)
+    }
+
+    componentWillMount = () => {
         this.props.fetchbridges();
         this.props.fetchUI();
+        this._requestCurrentUserLocation();
+    }
 
+    componentDidMount = () => {
         this.props.navigation.setParams({
             onSearchBarChangeText: this._onSearchBarChangeText,
             onSearchClick: this._flagSearchbarVisible,
@@ -123,8 +143,6 @@ class BridgeListScreen extends Component {
         this.props.navigation.setParams({
             isSliderLocationVisible: !this.props.navigation.state.params.isSliderLocationVisible
         })
-        this._saveCurrentUserLocation()
-
     }
 
     _flagSearchbarVisible = () => {
@@ -137,13 +155,16 @@ class BridgeListScreen extends Component {
         this.props.navigation.navigate(navigateTo, item);
     }
 
-    _saveCurrentUserLocation = async () => {
+    _requestCurrentUserLocation = async () => {
         try {
             const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, null);
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                navigator.
-                    geolocation.getCurrentPosition((pos) => this.props.setCurrentUserLocation(pos),
-                        (error) => console.log(error))
+                options = {
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 0
+                };
+                this.gpsListener = navigator.geolocation.watchPosition(this._sucessPosition, this._errorPosition, options);
             } else {
                 console.log('ACCESS_FINE_LOCATION permission denied');
             }
@@ -153,12 +174,20 @@ class BridgeListScreen extends Component {
     }
 
     render() {
-        const { currentUserLocation, selectedDistance, searchBarValue } = this.props.ui
+        if (this.props.loading)
+            return (<View style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <ActivityIndicator></ActivityIndicator></View>)
 
-        mapUserLocation = {}
-        if (currentUserLocation) {
-            mapUserLocation.lat = currentUserLocation.coords.latitude
-            mapUserLocation.lng = currentUserLocation.coords.longitude
+        const { currentUserLocation, selectedDistance, searchBarValue } = this.props.ui
+        mapUserLocation = null
+        if (currentUserLocation && currentUserLocation.coords) {
+            mapUserLocation = {}
+            mapUserLocation.lat = currentUserLocation.coords.latitude || null
+            mapUserLocation.lng = currentUserLocation.coords.longitude || null
         }
 
         filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, mapUserLocation, selectedDistance))
