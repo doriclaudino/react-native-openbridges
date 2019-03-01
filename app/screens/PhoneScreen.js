@@ -14,24 +14,17 @@ import {
     TouchableOpacity,
     View,
     Platform,
-    Alert,
     ActivityIndicator,
     Keyboard
 } from 'react-native';
 
 import Form from 'react-native-form';
-import { Appbar, Button } from 'react-native-paper';
+import { Appbar, Button, Snackbar } from 'react-native-paper';
 import CountryPicker from 'react-native-country-picker-modal';
 import firebase from 'react-native-firebase';
-import { connect } from 'react-redux';
-import { createOrUpdateUserUI } from '../actions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
-
-
-const mapDispatchToProps = { createOrUpdateUserUI }
-
-class PhoneScreen extends Component {
+export default class PhoneScreen extends Component {
 
     constructor(props) {
 
@@ -43,7 +36,10 @@ class PhoneScreen extends Component {
                 cca2: 'US',
                 callingCode: '1'
             },
-            loggedUser: null
+            loggedUser: null,
+            snackBarMessage: '',
+            snackBarVisible: false,
+            snackBarAction: null
         };
     }
 
@@ -67,8 +63,13 @@ class PhoneScreen extends Component {
                     },
                         this.refs.form.refs.textInput.focus())
                 })
-                .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => this.refs.form.refs.textInput.focus() }], { cancelable: false }));
-
+                .catch(error => this._showSnackBar(error.message, {
+                    label: 'Ok',
+                    onPress: () => {
+                        this.setState({ spinner: false });
+                        this && this.refs.form.refs.textInput.focus();
+                    },
+                }))
         } catch (err) {
             this._showError('Oops!', error.message)
         }
@@ -80,6 +81,10 @@ class PhoneScreen extends Component {
         }, () => Alert.alert(...args));
     }
 
+    _showSnackBar = (snackBarMessage, snackBarAction) => {
+        this.setState({ snackBarMessage, snackBarAction, snackBarVisible: true })
+    }
+
     _verifyCode = () => {
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
         try {
@@ -88,10 +93,15 @@ class PhoneScreen extends Component {
             if (confirmResult) {
                 confirmResult.confirm(code)
                     .then((user) => {
-                        Alert.alert('Success!', 'You have successfully verified your phone number', [{ text: 'OK' }])
-                        this.props.createOrUpdateUserUI();
+                        this._showSnackBar('You have successfully verified your phone number')
                     })
-                    .catch(error => this._showError('Oops!', error.message, [{ text: 'ok', onPress: () => { this && this.refs.form.refs.textInput.focus() } }], { cancelable: false }));
+                    .catch(error => this._showSnackBar(error.message, {
+                        label: 'Ok',
+                        onPress: () => {
+                            this.setState({ spinner: false });
+                            this && this.refs.form.refs.textInput.focus();
+                        },
+                    }))
             } else
                 this.setState({ spinner: false });
         } catch (err) {
@@ -173,6 +183,18 @@ class PhoneScreen extends Component {
 
     }
 
+    _renderSnackBar = () => {
+        return (
+            <Snackbar
+                visible={this.state.snackBarVisible}
+                onDismiss={() => this.setState({ snackBarVisible: false })}
+                action={this.state.snackBarAction}
+            >
+                {this.state.snackBarMessage}
+            </Snackbar>
+        )
+    }
+
     render() {
         let headerText = `What's your ${this.state.enterCode ? 'verification code' : 'phone number'}?`
         let buttonText = this.state.enterCode ? 'Verify confirmation code' : 'Send confirmation code';
@@ -223,13 +245,11 @@ class PhoneScreen extends Component {
                     <Button mode="contained" disabled={this.state.spinner} style={{ marginTop: 20, }} icon={{ source: "add-a-photo", color: '#744BAC' }} loading={this.state.spinner} onPress={this._getSubmitAction} color="#744BAC">{buttonText}</Button>
                     {this._renderFooter()}
                 </Form>
+                {this._renderSnackBar()}
             </View>
         );
     }
 }
-
-
-export default connect(null, mapDispatchToProps)(PhoneScreen)
 
 const MAX_LENGTH_CODE = 6;
 const MAX_LENGTH_NUMBER = 20;
