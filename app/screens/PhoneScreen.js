@@ -54,7 +54,7 @@ export default class PhoneScreen extends Component {
         try {
             const { phoneNumber } = this.refs.form.getValues()
             const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
-            firebase.auth().signInWithPhoneNumber(phoneNumberWithCountryCode)
+            firebase.auth().signInWithPhoneNumber(phoneNumberWithCountryCode, true)
                 .then(confirmResult => {
                     this.setState({
                         confirmResult,
@@ -86,6 +86,7 @@ export default class PhoneScreen extends Component {
     }
 
     _verifyCode = () => {
+        onSignInSuccess = this.props.navigation.getParam('onSignInSuccess')
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
         try {
             const { confirmResult } = this.state;
@@ -93,7 +94,8 @@ export default class PhoneScreen extends Component {
             if (confirmResult) {
                 confirmResult.confirm(code)
                     .then((user) => {
-                        this._showSnackBar('You have successfully verified your phone number')
+                        this._showSnackBar('You have successfully verified your phone number');
+                        onSignInSuccess();
                     })
                     .catch(error => this._showSnackBar(error.message, {
                         label: 'Ok',

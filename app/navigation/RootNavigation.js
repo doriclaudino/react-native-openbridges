@@ -5,7 +5,7 @@ import BridgeDetailScreen from '../screens/BridgeDetailScreen';
 import PhoneScreen from '../screens/PhoneScreen';
 import SignInScreen from '../screens/SignInScreen';
 import CustomDrawerRender from '../components/DrawerWithLogoutButton'
-
+import LoadingScreen from '../screens/LoadingScreen';
 
 const PhoneAuthStack = createStackNavigator({
     PhoneScreen: {
@@ -39,15 +39,9 @@ const DrawerNavigation = createDrawerNavigator({
 const AuthStack = createStackNavigator({
     SignInOptions: {
         screen: SignInScreen,
-        params: {
-            title: 'Sign-in',
-        }
     },
     PhoneSignIn: {
         screen: PhoneScreen,
-        params: {
-            title: 'Phone Sign-in',
-        }
     }
 },
     {
@@ -65,9 +59,10 @@ const switchNav = createSwitchNavigator(
     {
         App: DrawerNavigation,
         Auth: AuthStack,
+        Loading: LoadingScreen
     },
     {
-        initialRouteName: 'Auth',
+        initialRouteName: 'Loading',
     }
 );
 

@@ -3,12 +3,8 @@ import { View, } from 'react-native'
 import { Appbar, Button } from 'react-native-paper';
 import { LoginButton, AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
-import { connect } from 'react-redux';
-import { createUserUI } from '../actions';
 
-const mapDispatchToProps = { createUserUI }
-
-class SignInScreen extends React.Component {
+export default class SignInScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         return ({
             header: (
@@ -18,37 +14,23 @@ class SignInScreen extends React.Component {
             )
         })
     };
-    unsubscribe = {}
-
-    componentWillUnmount() {
-        this.unsubscribe()
-    }
 
     componentWillMount() {
-        //logout user from FacebookButton?
         LoginManager.logOut();
-
-        this.unsubscribe = firebase.auth().onAuthStateChanged(() => {
-            if (firebase.auth().currentUser) {
-                this.props.createUserUI()
-                    .then(() => this.props.navigation.navigate('App'))
-
-            }
-            else
-                this.props.navigation.navigate('Auth')
-        })
     }
 
     render() {
+        onSignInSuccess = this.props.navigation.getParam('onSignInSuccess')
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', }}>
                 <Button
                     icon="phone"
                     mode="contained"
-                    onPress={() => this.props.navigation.navigate('PhoneSignIn')}
+                    onPress={() => this.props.navigation.navigate('PhoneSignIn', { title: 'Phone Sign-In', onSignInSuccess })}
                     style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
                 >
                     USE PHONE</Button>
+
                 <LoginButton
                     onLoginFinished={
                         (error, result) => {
@@ -60,23 +42,14 @@ class SignInScreen extends React.Component {
                                 AccessToken.getCurrentAccessToken().then(
                                     (data) => {
                                         const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken)
-                                        if (firebase.auth().currentUser) {
-                                            firebase.auth().currentUser.linkAndRetrieveDataWithCredential(credential)
-                                                .then((ok) => console.log(ok), (err) => console.log(err))
-                                        } else {
-                                            firebase.auth().signInWithCredential(credential)
-                                                .then((ok) => console.log(ok), (err) => console.log(err))
-                                        }
+                                        firebase.auth().signInWithCredential(credential)
+                                            .then(onSignInSuccess, (err) => console.log(err))
                                     }
                                 )
                             }
                         }
                     } />
-
-                {firebase.auth().currentUser && <Button icon="warning" mode="contained" onPress={() => { firebase.auth().signOut() }}>LOGOUT FIREBASE</Button>}
             </View>
         );
     }
 }
-
-export default connect(null, mapDispatchToProps)(SignInScreen)

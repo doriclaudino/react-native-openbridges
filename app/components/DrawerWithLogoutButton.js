@@ -6,12 +6,10 @@ import firebase from 'react-native-firebase';
 
 
 export default DrawerWithLogoutButton = (props) => {
-    console.log(props)
-    console.log(props.navigation.initialRouteName)
     _handleOnPress = () => {
         firebase.auth()
             .signOut()
-            .then(() => props.navigation.navigate('Auth'))
+            .then(() => props.navigation.navigate('Loading'))
             .catch((error) => console.log(error))
     }
     return (
