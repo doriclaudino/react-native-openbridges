@@ -77,20 +77,22 @@ export const clearBridges = () => ({
     type: ActionTypes.CLEAR_BRIDGES
 });
 
-export const fetchUI = () => async dispatch => {
+export const fetchOrCreateUI = () => async dispatch => {
     console.log('fetchUI')
     try {
         const { currentUser } = firebase.auth()
         userUiRef = firebase.database().ref(`ui/${currentUser.uid}`)
         userUiRef.off('value')
         userUiRef.on('value', (snapshot) => {
-            dispatch(fetchUISuccess(snapshot.val()))
+            if (!snapshot.exists()) {
+                userUiRef.set(defaultUISchema)
+            } else
+                dispatch(fetchUISuccess(snapshot.val()))
         });
     } catch (error) {
         console.error(error);
     }
 };
-
 
 const defaultUISchema = {
     currentUserLocation: {
@@ -106,20 +108,6 @@ const defaultUISchema = {
     isSliderLocationVisible: false,
     searchBarValue: ''
 }
-
-export const createUserUI = () => async dispatch => {
-    try {
-        const { uid } = firebase.auth().currentUser
-        userUiRef = firebase.database().ref(`ui/${uid}`)
-        userUiRef.once('value', function (snapshot) {
-            if (!snapshot.exists())
-                userUiRef.set(defaultUISchema)
-        });
-    } catch (error) {
-        console.error(error);
-    }
-};
-
 
 export const updatedSelectDistance = (selectedDistance) => async dispatch => {
     try {

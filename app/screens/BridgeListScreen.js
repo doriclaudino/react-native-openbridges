@@ -21,17 +21,17 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
 import { capitalizeSentence, filterNameAndLocation } from '../helpers'
-import { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation } from '../actions';
+import { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation } from '../actions';
 import { PermissionsAndroid } from 'react-native';
 
 const mapStateToProps = (state) => {
     loading = true
     if (state.ui && state.bridges && state.bridges.length)
         loading = false
-    return { bridges: state.bridges, ui: state.ui, loading }
+    return { bridges: state.bridges, ui: state.ui, loading: false }
 }
 
-const mapDispatchToProps = { fetchbridges, fetchUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
+const mapDispatchToProps = { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
 
 class BridgeListScreen extends Component {
     constructor(props) {
@@ -118,7 +118,7 @@ class BridgeListScreen extends Component {
 
     componentWillMount = () => {
         this.props.fetchbridges();
-        this.props.fetchUI();
+        this.props.fetchOrCreateUI();
         this._requestCurrentUserLocation();
     }
 
