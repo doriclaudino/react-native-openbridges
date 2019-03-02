@@ -20,17 +20,19 @@ class App extends Component {
   componentWillUnmount() {
     firebase.database().ref('bridges').off('value')
 
-    const { uid } = firebase.auth().currentUser
-    firebase.database()
-      .ref('ui')
-      .child(uid)
-      .off('value')
+    const { currentUser } = firebase.auth()
+    if (currentUser) {
+      firebase.database()
+        .ref('ui')
+        .child(currentUser.uid)
+        .off('value')
+    }
     console.log('firebase listener closed')
   }
 
   render() {
     return (<PaperProvider>
-      <RootNavigation /> 
+      <RootNavigation />
     </PaperProvider>)
   }
 }
