@@ -3,6 +3,7 @@ import { View, } from 'react-native'
 import { Appbar, Button } from 'react-native-paper';
 import { LoginButton, AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
+import FacebookLogin from '../components/FacebookLogin'
 
 export default class SignInScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -30,6 +31,8 @@ export default class SignInScreen extends React.Component {
                     style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
                 >
                     USE PHONE</Button>
+
+                <FacebookLogin text='FACEBOOK LOGIN' onSuccess={onSignInSuccess} onError={err => console.log(err)} />
 
                 <LoginButton
                     onLoginFinished={
