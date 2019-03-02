@@ -27,7 +27,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 export default class PhoneScreen extends Component {
 
     constructor(props) {
-
         super(props);
         this.state = {
             enterCode: false,
@@ -71,43 +70,47 @@ export default class PhoneScreen extends Component {
                     },
                 }))
         } catch (err) {
-            this._showError('Oops!', error.message)
+            this._showSnackBar(err.message)
         }
-    }
-
-    _showError = (...args) => {
-        this.setState({
-            spinner: false,
-        }, () => Alert.alert(...args));
     }
 
     _showSnackBar = (snackBarMessage, snackBarAction) => {
         this.setState({ snackBarMessage, snackBarAction, snackBarVisible: true })
     }
 
-    _verifyCode = () => {
+    _verifyCode = async () => {
         onSignInSuccess = this.props.navigation.getParam('onSignInSuccess')
+        linkAccounts = this.props.navigation.getParam('linkAccounts')
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
         try {
             const { confirmResult } = this.state;
             const { code } = this.refs.form.getValues()
             if (confirmResult) {
-                confirmResult.confirm(code)
-                    .then((user) => {
-                        this._showSnackBar('You have successfully verified your phone number');
-                        onSignInSuccess();
-                    })
-                    .catch(error => this._showSnackBar(error.message, {
-                        label: 'Ok',
-                        onPress: () => {
-                            this.setState({ spinner: false });
-                            this && this.refs.form.refs.textInput.focus();
-                        },
-                    }))
+                const credential = await firebase.auth.PhoneAuthProvider.credential(confirmResult.verificationId, code)
+                if (firebase.auth().currentUser && linkAccounts) {
+                    firebase.auth().currentUser.linkWithCredential(credential)
+                        .then((ok) => {
+                            onSignInSuccess();
+                        })
+                } else
+                    confirmResult.confirm(code)
+                        .then((user) => {
+                            this._showSnackBar('You have successfully verified your phone number');
+                            onSignInSuccess();
+                        })
+                        .catch((error) => {
+                            this._showSnackBar(error.message, {
+                                label: 'Ok',
+                                onPress: () => {
+                                    this.setState({ spinner: false });
+                                    this && this.refs.form.refs.textInput.focus();
+                                },
+                            })
+                        })
             } else
                 this.setState({ spinner: false });
         } catch (err) {
-            this._showError('Oops!', error.message)
+            this._showSnackBar(err.message)
         }
     }
 

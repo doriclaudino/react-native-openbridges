@@ -6,6 +6,7 @@ import PhoneScreen from '../screens/PhoneScreen';
 import SignInScreen from '../screens/SignInScreen';
 import CustomDrawerRender from '../components/DrawerWithLogoutButton'
 import LoadingScreen from '../screens/LoadingScreen';
+import LinkAccountScreen from '../screens/LinkAccountScreen';
 
 const PhoneAuthStack = createStackNavigator({
     PhoneScreen: {
@@ -25,8 +26,22 @@ const BridgeStack = createStackNavigator({
     },
     Detail: {
         screen: BridgeDetailScreen,
+    },
+    LinkAccount: {
+        screen: LinkAccountScreen,
+    },
+    LinkPhoneAccount: {
+        screen: PhoneScreen,
     }
-});
+},
+    {
+        defaultNavigationOptions: {
+            headerStyle: {
+                backgroundColor: '#6200ee',
+            },
+            headerTintColor: '#fff',
+        }
+    });
 
 const DrawerNavigation = createDrawerNavigator({
     Bridges: BridgeStack,

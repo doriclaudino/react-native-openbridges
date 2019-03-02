@@ -8,11 +8,17 @@ export default class LoadingScreen extends React.Component {
     }
 
     componentDidMount() {
-        if (firebase.auth().currentUser)
+        linkAccounts = this.props.navigation.getParam('linkAccounts', false)
+        if (firebase.auth().currentUser && !linkAccounts)
             this.props.navigation.navigate('App')
-        else
-            this.props.navigation.navigate('SignInOptions', { title: 'Sign-In', onSignInSuccess: this._signInSuccess })
+        else {
+            if (linkAccounts)
+                this.props.navigation.navigate('LinkAccount', { title: 'Link Accounts', linkAccounts })
+            else
+                this.props.navigation.navigate('SignInOptions', { title: 'Sign-In', onSignInSuccess: this._signInSuccess, linkAccounts })
+        }
     }
+    
     render() {
         return (
             <View style={styles.container}>
