@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Appbar, Button, Text, Snackbar } from 'react-native-paper';
-import { AccessToken, LoginManager } from 'react-native-fbsdk';
+import { Button, Text, Snackbar } from 'react-native-paper';
 import firebase from 'react-native-firebase';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import FacebookLogin from '../components/FacebookLogin'
 
 
 export default class LinkAccountScreen extends React.Component {
@@ -82,35 +81,14 @@ export default class LinkAccountScreen extends React.Component {
     _renderFacebook = () => {
         provider = 'facebook.com'
         if (this._existProvider(provider))
-            return (<Button
-                disabled={this.state.disableUnlink}
-                icon={() => <MaterialCommunityIcons name="facebook" size={24} color="white" />}
-                mode="contained"
-                style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
+            return (<FacebookLogin
+                text='UNLINK FACEBOOK'
+                onError={err => console.log(err)}
                 onPress={() => this._unlinkProvider(provider)}
-            >
-                UNLINK FACEBOOK</Button>)
+                disabled={this.state.disableUnlink}
+            />)
         else
-            return (<Button
-                icon={() => <MaterialCommunityIcons name="facebook" size={24} color="white" />}
-                mode="contained"
-                style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
-                onPress={this._linkFacebook}
-            >
-                LINK FACEBOOK</Button>)
-    }
-
-    _linkFacebook = async () => {
-        let result;
-        try {
-            LoginManager.setLoginBehavior('NATIVE_ONLY');
-            result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-                .then(result => this._linkFacebookResult(result))
-        } catch (error) {
-            LoginManager.setLoginBehavior('WEB_ONLY');
-            result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-                .then(result => this._linkFacebookResult(result))
-        }
+            return (<FacebookLogin text='LINK FACEBOOK' onError={err => console.log(err)} linkAccounts={true} />)
     }
 
     _unlinkProvider = async (provider) => {
@@ -120,24 +98,6 @@ export default class LinkAccountScreen extends React.Component {
             firebase.auth().currentUser.unlink(provider)
                 .then(() => this._showSnackBar(`Account unlinked`))
                 .catch(() => this._showSnackBar(`Can't unlinked account`))
-    }
-
-    _linkFacebookResult = (result) => {
-        if (result.isCancelled) {
-            console.log("login is cancelled.");
-        } else {
-            AccessToken.getCurrentAccessToken().then(
-                (data) => {
-                    const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken)
-                    if (firebase.auth().currentUser) {
-                        firebase.auth()
-                            .currentUser.linkWithCredential(credential)
-                            .then((ok) => this._showSnackBar('Account linked'),
-                                (err) => console.log(err))
-                    }
-                }
-            )
-        }
     }
 
     _showSnackBar = (snackBarMessage, snackBarAction) => {
