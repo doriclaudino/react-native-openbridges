@@ -95,7 +95,6 @@ export default class PhoneScreen extends Component {
                 } else
                     confirmResult.confirm(code)
                         .then((user) => {
-                            this._showSnackBar('You have successfully verified your phone number');
                             onSignInSuccess();
                         })
                         .catch((error) => {
