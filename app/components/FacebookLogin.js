@@ -60,8 +60,9 @@ export default class FacebookLogin extends React.Component {
         return (<Button
             icon={() => <MaterialCommunityIcons name="facebook" size={24} color="white" />}
             mode="contained"
-            style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
-            onPress={this._signInOrLink}
+            style={{ width: 190, backgroundColor: '#3b5998', marginVertical: 5, }}
+            onPress={typeof this.props.onPress === 'function' ? this.props.onPress : this._signInOrLink}
+            {...this.props}
         >
             {this.props.text}</Button>)
     }
