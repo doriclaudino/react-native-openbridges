@@ -4,7 +4,7 @@ import firebase from 'react-native-firebase';
 
 export default class LoadingScreen extends React.Component {
     _signInSuccess = () => {
-        this.props.navigation.navigate('App')
+        this.props.navigation.navigate('Loading')
     }
 
     componentDidMount() {
@@ -15,7 +15,7 @@ export default class LoadingScreen extends React.Component {
             if (linkAccounts)
                 this.props.navigation.navigate('LinkAccount', { title: 'Link Accounts', linkAccounts })
             else
-                this.props.navigation.navigate('SignInOptions', { title: 'Credentials', linkAccounts })
+                this.props.navigation.navigate('SignInOptions', { title: 'Credentials', linkAccounts, onSignInSuccess: this._signInSuccess })
         }
     }
 

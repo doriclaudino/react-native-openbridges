@@ -80,8 +80,8 @@ export default class PhoneScreen extends Component {
     }
 
     _verifyCode = async () => {
-        onSignInSuccess = this.props.navigation.getParam('onSignInSuccess')
-        linkAccounts = this.props.navigation.getParam('linkAccounts')
+        const onSignInSuccess = this.props.navigation.getParam('onSignInSuccess', false)
+        const linkAccounts = this.props.navigation.getParam('linkAccounts', false)
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
         try {
             const { confirmResult } = this.state;
@@ -91,15 +91,14 @@ export default class PhoneScreen extends Component {
                 if (firebase.auth().currentUser && linkAccounts) {
                     firebase.auth().currentUser.linkWithCredential(credential)
                         .then((ok) => {
-                            //after link, just goback, and after signin?
-                            this.props.navigation.goBack();
+                            if (onSignInSuccess)
+                                onSignInSuccess(credential)
                         })
                 } else {
-                    console.log('confirm code', code)
                     confirmResult.confirm(code)
                         .then((user) => {
-                            //after link, just goback, and after signin? App route?
-                            this.props.navigation.goBack();
+                            if (onSignInSuccess)
+                                onSignInSuccess(credential)
                         })
                         .catch((error) => {
                             this._showSnackBar(error.message, {

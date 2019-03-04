@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default class FacebookLogin extends React.Component {
-    _signInOrLink = async () => {
+        _signInOrLink = async () => {
         let result;
         try {
             LoginManager.setLoginBehavior('NATIVE_ONLY');
@@ -43,14 +43,12 @@ export default class FacebookLogin extends React.Component {
     }
 
     _onError = (err) => {
-        console.log(err)
         if (this.props.onError) {
             this.props.onError(err)
         }
     }
 
     _onSuccess = (ok) => {
-        console.log(ok)
         if (this.props.onSuccess) {
             this.props.onSuccess(ok)
         }
