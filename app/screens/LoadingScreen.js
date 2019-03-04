@@ -15,10 +15,10 @@ export default class LoadingScreen extends React.Component {
             if (linkAccounts)
                 this.props.navigation.navigate('LinkAccount', { title: 'Link Accounts', linkAccounts })
             else
-                this.props.navigation.navigate('SignInOptions', { title: 'Sign-In', onSignInSuccess: this._signInSuccess, linkAccounts })
+                this.props.navigation.navigate('SignInOptions', { title: 'Credentials', linkAccounts })
         }
     }
-    
+
     render() {
         return (
             <View style={styles.container}>

@@ -17,7 +17,7 @@ export const setCurrentUserLocation = (currentUserLocation) => async dispatch =>
     try {
         const { currentUser } = firebase.auth()
 
-        if (currentUser || currentUserLocation)
+        if (currentUser && currentUserLocation)
             firebase.database()
                 .ref(`ui/${currentUser.uid}/currentUserLocation`)
                 .set(currentUserLocation)
@@ -80,15 +80,16 @@ export const clearBridges = () => ({
 export const fetchOrCreateUI = () => async dispatch => {
     console.log('fetchUI')
     try {
-        const { currentUser } = firebase.auth()
-        userUiRef = firebase.database().ref(`ui/${currentUser.uid}`)
-        userUiRef.off('value')
-        userUiRef.on('value', (snapshot) => {
-            if (!snapshot.exists()) {
-                userUiRef.set(defaultUISchema)
-            } else
-                dispatch(fetchUISuccess(snapshot.val()))
-        });
+        if (firebase.auth().currentUser) {
+            userUiRef = firebase.database().ref(`ui/${firebase.auth().currentUser.uid}`)
+            userUiRef.off('value')
+            userUiRef.on('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    userUiRef.set(defaultUISchema)
+                } else
+                    dispatch(fetchUISuccess(snapshot.val()))
+            });
+        }
     } catch (error) {
         console.error(error);
     }

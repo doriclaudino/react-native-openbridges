@@ -28,6 +28,7 @@ export default class PhoneScreen extends Component {
 
     constructor(props) {
         super(props);
+        console.log(this.props)
         this.state = {
             enterCode: false,
             spinner: false,
@@ -90,12 +91,15 @@ export default class PhoneScreen extends Component {
                 if (firebase.auth().currentUser && linkAccounts) {
                     firebase.auth().currentUser.linkWithCredential(credential)
                         .then((ok) => {
-                            onSignInSuccess();
+                            //after link, just goback, and after signin?
+                            this.props.navigation.goBack();
                         })
-                } else
+                } else {
+                    console.log('confirm code', code)
                     confirmResult.confirm(code)
                         .then((user) => {
-                            onSignInSuccess();
+                            //after link, just goback, and after signin? App route?
+                            this.props.navigation.goBack();
                         })
                         .catch((error) => {
                             this._showSnackBar(error.message, {
@@ -106,6 +110,7 @@ export default class PhoneScreen extends Component {
                                 },
                             })
                         })
+                }
             } else
                 this.setState({ spinner: false });
         } catch (err) {

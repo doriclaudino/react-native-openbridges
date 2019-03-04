@@ -24,12 +24,6 @@ export default class LinkAccountScreen extends React.Component {
     }
 
     componentWillMount() {
-        const { currentUser } = firebase.auth()
-        this.setState({
-            disableUnlink: currentUser.providerData.length === 1,
-            providers: currentUser.providerData.map(provider => provider.providerId)
-        })
-
         this.unsubscribe = firebase.auth().onUserChanged((user) => {
             if (user) {
                 const { currentUser } = firebase.auth()
@@ -50,9 +44,9 @@ export default class LinkAccountScreen extends React.Component {
         return this.state.providers.indexOf(name) > -1
     }
 
-
-    _onSignInSuccess = credential => {
-        this.props.navigation.goBack()
+    //load again and route there?
+    _onSignInSuccess = (credential) => {
+        this.props.navigation.navigate('Loading')
     }
 
     _renderPhone = () => {
@@ -67,16 +61,29 @@ export default class LinkAccountScreen extends React.Component {
                 onPress={() => this._unlinkProvider('phone')}
                 style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
             >
-                UNLINK USE PHONE</Button>)
-        else
+                UNLINK PHONE</Button>)
+        else if (firebase.auth().currentUser)
             return (<Button
                 icon="phone"
                 mode="contained"
                 style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
-                onPress={() => this.props.navigation.navigate('LinkPhoneAccount', { title: 'Link you phone', onSignInSuccess: this._onSignInSuccess, linkAccounts })}
+                onPress={() => this.props.navigation.navigate('LinkPhoneAccount', { title: 'Link you phone', linkAccounts })}
             >
-                LINK USE PHONE</Button>)
+                LINK PHONE</Button>)
+        return (<Button
+            icon="phone"
+            mode="contained"
+            style={{ width: 190, backgroundColor: 'gray', marginBottom: 10, }}
+            onPress={() => this.props.navigation.navigate('PhoneSignIn', { title: 'Sign-in with your phone' })}
+        >
+            SIGN-IN WITH PHONE</Button>)
+
     }
+
+    //must improve on redirects after signin
+    //and after link accounts
+    //after sigin, must redirect to Loading again?
+    //after link still in the same page?
 
     _renderFacebook = () => {
         provider = 'facebook.com'
@@ -87,8 +94,9 @@ export default class LinkAccountScreen extends React.Component {
                 onPress={() => this._unlinkProvider(provider)}
                 disabled={this.state.disableUnlink}
             />)
-        else
-            return (<FacebookLogin text='LINK FACEBOOK' onError={err => console.log(err)} linkAccounts={true} />)
+        else if (firebase.auth().currentUser)
+            return (<FacebookLogin text='LINK FACEBOOK' onSuccess={ok => console.log('link')} onError={err => console.log(err)} linkAccounts={true} />)
+        return (<FacebookLogin text='SIGN-IN WITH FACEBOOK' onSuccess={ok => console.log('signin')} onError={err => console.log(err)} linkAccounts={true} />)
     }
 
     _unlinkProvider = async (provider) => {
@@ -118,6 +126,9 @@ export default class LinkAccountScreen extends React.Component {
     }
 
     render() {
+        onSignInSuccess = this.props.navigation.getParam('onSignInSuccess')
+        linkAccounts = this.props.navigation.getParam('linkAccounts')
+        console.log(this.props.navigation.state.params)
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 {this._renderPhone()}

@@ -53,7 +53,7 @@ const DrawerNavigation = createDrawerNavigator({
 
 const AuthStack = createStackNavigator({
     SignInOptions: {
-        screen: SignInScreen,
+        screen: LinkAccountScreen,
     },
     PhoneSignIn: {
         screen: PhoneScreen,
