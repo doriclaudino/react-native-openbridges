@@ -84,10 +84,14 @@ export const fetchOrCreateUI = () => async dispatch => {
             userUiRef = firebase.database().ref(`ui/${firebase.auth().currentUser.uid}`)
             userUiRef.off('value')
             userUiRef.on('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    userUiRef.set(defaultUISchema)
-                } else
-                    dispatch(fetchUISuccess(snapshot.val()))
+                if (firebase.auth().currentUser) {
+                    if (!snapshot.exists())
+                        userUiRef.set(defaultUISchema)
+                    else
+                        dispatch(fetchUISuccess(snapshot.val()))
+                } else {
+                    firebase.database().ref(`ui/${snapshot.key}`).off('value')
+                }
             });
         }
     } catch (error) {
