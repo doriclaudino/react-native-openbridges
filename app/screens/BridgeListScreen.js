@@ -13,7 +13,7 @@ import {
     Image,
     Slider
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
 import { connect } from 'react-redux';
 
 import BridgeStatus from '../components/BridgeStatus';
@@ -28,7 +28,7 @@ const mapStateToProps = (state) => {
     loading = true
     if (state.ui && state.bridges && state.bridges.length)
         loading = false
-    return { bridges: state.bridges, ui: state.ui, loading: false }
+    return { bridges: state.bridges, ui: state.ui, loading }
 }
 
 const mapDispatchToProps = { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
@@ -38,6 +38,21 @@ class BridgeListScreen extends Component {
         super(props);
         gpsListener = {}
         listenerTimeout = {}
+        this.state = {}
+        Snackbar.DURATION_SHORT = 2000
+
+
+        this.gpsOptions = {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 60000 //in milliseconds
+        };
+
+        this.locationIcon = {
+            pending: 'location-searching',
+            disable: 'location-disabled',
+            enable: 'my-location'
+        }
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -57,7 +72,7 @@ class BridgeListScreen extends Component {
             return ({
                 header: (
                     <SliderAppbar
-                        onCancelClick={params.onFilterLocationClick}
+                        onCancelClick={params.onSliderLocationCloseClick}
                         disabled={!params.onDistanceChange}
                         onValueChange={(value) => {
                             params.onDistanceChange(value);
@@ -76,7 +91,8 @@ class BridgeListScreen extends Component {
                     <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
                     <Appbar.Content title={navigation.getParam('title', 'default')} />
                     < Appbar.Action disabled={!params.onSearchClick} icon="search" onPress={() => { if (params) { params.onSearchClick() } }} />
-                    < Appbar.Action disabled={!params.onFilterLocationClick || !params.currentUserLocation} icon={() => <Entypo name="ruler" size={24} color="white" />} onPress={() => { params.onFilterLocationClick() }} />
+                    {params.currentUserLocation && < Appbar.Action disabled={!params.onFilterLocationClick} icon={() => <Entypo name="ruler" size={24} color="white" />} onPress={() => { params.onFilterLocationClick() }} />}
+                    < Appbar.Action disabled={!params.onRequestLocationClick} icon={params.locationIcon} onPress={() => { params.onRequestLocationClick() }} />
                 </Appbar.Header>
             )
         })
@@ -85,8 +101,7 @@ class BridgeListScreen extends Component {
 
     componentWillReceiveProps({ ui, loading }) {
         if (!loading) {
-            if (this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance
-                && ui.selectedDistance) {
+            if (ui.selectedDistance && this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance) {
                 this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
             }
 
@@ -94,21 +109,22 @@ class BridgeListScreen extends Component {
                 this.props.navigation.setParams({ currentUserLocation: ui.currentUserLocation });
             }
 
-            if (this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue
-                && ui.searchBarValue) {
+            if (ui.searchBarValue && this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue) {
                 this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
             }
         }
     }
 
 
-    _errorPosition = (error) => {
+    _onWatchUserLocationError = (error) => {
+        this._updateLocationIcon(this.locationIcon.disable)
         navigator.geolocation.clearWatch(this.gpsListener)
-        this.listenerTimeout = setTimeout(() => this._requestCurrentUserLocation(), 15000)
+        this.listenerTimeout = setTimeout(() => this._watchUserPosition(), 3000)
     }
 
     _sucessPosition = (pos) => {
-        this.props.setCurrentUserLocation(pos)
+        this.props.setCurrentUserLocation(pos);
+        this._updateLocationIcon(this.locationIcon.enable)
     }
 
     componentWillUnmount = () => {
@@ -119,7 +135,7 @@ class BridgeListScreen extends Component {
     componentWillMount = () => {
         this.props.fetchbridges();
         this.props.fetchOrCreateUI();
-        this._requestCurrentUserLocation();
+        this.listenerTimeout = setTimeout(() => this._watchUserPosition(), 1000)
     }
 
     componentDidMount = () => {
@@ -127,9 +143,17 @@ class BridgeListScreen extends Component {
             onSearchBarChangeText: this._onSearchBarChangeText,
             onSearchClick: this._flagSearchbarVisible,
             onDistanceChange: this._onDistanceChange,
-            onFilterLocationClick: this._onFilterLocationClick,
+            onRequestLocationClick: this._onRequestLocationClick,
+            onFilterLocationClick: this._flagSliderLocationVisible,
+            onSliderLocationCloseClick: this._flagSliderLocationVisible,
+            locationIcon: this.locationIcon.pending,
         })
     }
+
+    _onRequestLocationClick = () => {
+        this._getCurrentPositionOnce()
+    }
+
 
     _onSearchBarChangeText = (text) => {
         this.props.updateSearchBarValue(text)
@@ -139,10 +163,27 @@ class BridgeListScreen extends Component {
         this.props.updatedSelectDistance(selectedDistance)
     }
 
-    _onFilterLocationClick = () => {
+    _updateLocationIcon = (icon) => {
         this.props.navigation.setParams({
-            isSliderLocationVisible: !this.props.navigation.state.params.isSliderLocationVisible
+            locationIcon: icon
         })
+    }
+
+    _getCurrentPositionOnce = async () => {
+        await navigator.geolocation.getCurrentPosition(this._sucessPosition, (error) => {
+            if (this._existCurrentUserLocation())
+                this._showSnackBar('Using your old GPS location.', { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
+            else
+                this._showSnackBar(error.message, { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
+            this._updateLocationIcon(this.locationIcon.disable)
+        }, this.gpsOptions);
+    }
+
+    _flagSliderLocationVisible = () => {
+        if (this._existCurrentUserLocation())
+            this.props.navigation.setParams({
+                isSliderLocationVisible: !this.props.navigation.state.params.isSliderLocationVisible
+            })
     }
 
     _flagSearchbarVisible = () => {
@@ -155,22 +196,45 @@ class BridgeListScreen extends Component {
         this.props.navigation.navigate(navigateTo, item);
     }
 
-    _requestCurrentUserLocation = async () => {
+    _watchUserPosition = async () => {
         try {
             const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, null);
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                options = {
-                    enableHighAccuracy: false,
-                    timeout: 5000,
-                    maximumAge: 0
-                };
-                this.gpsListener = navigator.geolocation.watchPosition(this._sucessPosition, this._errorPosition, options);
+                this._updateLocationIcon(this.locationIcon.pending)
+                this.gpsListener = navigator.geolocation.watchPosition(this._sucessPosition, this._onWatchUserLocationError, this.gpsOptions);
             } else {
-                console.log('ACCESS_FINE_LOCATION permission denied');
+                if (this._existCurrentUserLocation())
+                    this._showSnackBar('Using your old GPS location.', { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
+                else
+                    this._showSnackBar('Location history not found.', { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
             }
         } catch (err) {
             console.warn(err);
         }
+    }
+
+    _existCurrentUserLocation = () => {
+        if (!this.props.ui || !this.props.ui.currentUserLocation)
+            return false
+        else
+            return true
+    }
+
+    _showSnackBar = (snackBarMessage, snackBarAction) => {
+        this.setState({ snackBarMessage, snackBarAction, snackBarVisible: true })
+    }
+
+    _renderSnackBar = () => {
+        return (
+            <Snackbar
+                visible={this.state.snackBarVisible}
+                onDismiss={() => this.setState({ snackBarVisible: false })}
+                action={this.state.snackBarAction}
+                duration={Snackbar.DURATION_SHORT}
+            >
+                {this.state.snackBarMessage}
+            </Snackbar>
+        )
     }
 
     render() {
@@ -214,6 +278,7 @@ class BridgeListScreen extends Component {
                         </View>
                     }
                 />
+                {this._renderSnackBar()}
             </View>
         )
     }
