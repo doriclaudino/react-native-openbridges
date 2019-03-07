@@ -48,7 +48,6 @@ export default class PhoneScreen extends Component {
         this.unmount = true;
     }
 
-
     static navigationOptions = ({ navigation }) => {
         return {
             title: navigation.getParam('title', 'Phone Sign-in')
@@ -123,6 +122,8 @@ export default class PhoneScreen extends Component {
     }
 
     _signInOrLinkAccount = (credential) => {
+        const onSignInSuccess = this.props.navigation.getParam('onSignInSuccess', false)
+        const linkAccounts = this.props.navigation.getParam('linkAccounts', false)
         if (firebase.auth().currentUser && linkAccounts) {
             firebase.auth().currentUser.linkWithCredential(credential)
                 .then((ok) => {
@@ -143,8 +144,6 @@ export default class PhoneScreen extends Component {
     }
 
     _verifyCode = async () => {
-        const onSignInSuccess = this.props.navigation.getParam('onSignInSuccess', false)
-        const linkAccounts = this.props.navigation.getParam('linkAccounts', false)
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
         try {
             const { confirmResult } = this.state;
