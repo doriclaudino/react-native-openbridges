@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollView, View, Slider } from 'react-native';
+import { ScrollView, View, Slider, BackHandler, } from 'react-native';
 import {
     Text,
     Button,
@@ -19,15 +19,27 @@ export default class extends React.Component {
 
     _onValueChange = (value) => this.setState({ currentValue: value })
 
-
     _setDefaultValue = () => this.setState({ currentValue: this.state.defaultValue })
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this._handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this._handleBackButton);
+    }
+
+    _handleBackButton = () => {
+        this.props.onClose();
+        return true; //act as stopPropagation
+    }
 
     render() {
         const { visible, onClose, onConfirm } = this.props;
         const { currentValue } = this.state;
         return (
             <Portal>
-                <Dialog onDismiss={() => { this._setDefaultValue(); onClose(); }} visible={visible}>
+                <Dialog dismissable={false} visible={visible}>
                     <Dialog.Title>Bridge Status Threshold</Dialog.Title>
                     <Dialog.ScrollArea style={{ maxHeight: 170, paddingHorizontal: 0 }}>
                         <ScrollView>
@@ -41,12 +53,15 @@ export default class extends React.Component {
                         </ScrollView>
                     </Dialog.ScrollArea>
                     <Dialog.Actions>
-                        <Button onPress={() => {
-                            this._setDefaultValue();
-                        }}>Reset</Button>
-                        <Button onPress={() => {
-                            onConfirm(currentValue);
-                        }}>Ok</Button>
+                        <View style={{ flex: 1, flexDirection: "row", justifyContent: 'space-between' }}>
+                            <Button onPress={() => {
+                                this._setDefaultValue();
+                                onClose();
+                            }}>Cancel</Button>
+                            <Button onPress={() => {
+                                onConfirm(currentValue);
+                            }}>save({currentValue})</Button>
+                        </View>
                     </Dialog.Actions>
                 </Dialog>
             </Portal>

@@ -60,7 +60,7 @@ class BridgeDetailScreen extends Component {
         this.props.navigation.setParams({
             onDialogSliderClick: this._flagDialogSlider
         });
-    }
+    }    
 
     _renderDialogSlider = (bridge) => {
         return (<DialogSlider
