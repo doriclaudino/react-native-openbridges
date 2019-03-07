@@ -130,13 +130,25 @@ export default class PhoneScreen extends Component {
                     if (onSignInSuccess)
                         onSignInSuccess(credential)
                 })
+                .catch(error => this._showCodeError(error))
         } else {
             firebase.auth().signInWithCredential(credential)
                 .then((ok) => {
                     if (onSignInSuccess)
                         onSignInSuccess(credential)
                 })
+                .catch(error => this._showCodeError(error))
         }
+    }
+
+    _showCodeError = (error) => {
+        this._showSnackBar(error.message, {
+            label: 'Ok',
+            onPress: () => {
+                this.setState({ spinner: false });
+                this && this.refs.form.refs.textInput.focus();
+            },
+        })
     }
 
     _showSnackBar = (snackBarMessage, snackBarAction) => {
