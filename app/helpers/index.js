@@ -23,7 +23,7 @@ export const capitalizeSentence = (sentence) => {
 }
 
 const distance = (loc1, loc2, unit) => {
-  let lat1 = loc1.lat, lon1 = loc1.lng, lat2 = loc2.lat, lon2 = loc2.lng
+  let lat1 = loc1.lat, lon1 = loc1.lng, lat2 = loc2.coords.latitude, lon2 = loc2.coords.longitude
   if ((lat1 == lat2) && (lon1 == lon2)) {
     return 0;
   }

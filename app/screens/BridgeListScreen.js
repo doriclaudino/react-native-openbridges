@@ -26,9 +26,12 @@ import { PermissionsAndroid } from 'react-native';
 
 const mapStateToProps = (state) => {
     loading = true
-    if (state.ui && state.bridges && state.bridges.length)
+    filteredBridges = []
+    if (state.ui && state.bridges && state.bridges.length) {
+        filteredBridges = state.bridges.filter(bridge => filterNameAndLocation(bridge, state.ui.searchBarValue, state.ui.currentUserLocation, state.ui.selectedDistance))
         loading = false
-    return { bridges: state.bridges, ui: state.ui, loading }
+    }
+    return { ui: state.ui, loading, filteredBridges }
 }
 
 const mapDispatchToProps = { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation }
@@ -238,7 +241,8 @@ class BridgeListScreen extends Component {
     }
 
     render() {
-        if (this.props.loading)
+        const { filteredBridges, loading } = this.props
+        if (loading)
             return (<View style={{
                 flex: 1,
                 justifyContent: 'center',
@@ -246,15 +250,6 @@ class BridgeListScreen extends Component {
             }}>
                 <ActivityIndicator></ActivityIndicator></View>)
 
-        const { currentUserLocation, selectedDistance, searchBarValue } = this.props.ui
-        mapUserLocation = null
-        if (currentUserLocation && currentUserLocation.coords) {
-            mapUserLocation = {}
-            mapUserLocation.lat = currentUserLocation.coords.latitude || null
-            mapUserLocation.lng = currentUserLocation.coords.longitude || null
-        }
-
-        filteredBridges = this.props.bridges.filter(bridge => filterNameAndLocation(bridge, searchBarValue, mapUserLocation, selectedDistance))
         return (
             <View style={styles.container}>
                 <FlatList
