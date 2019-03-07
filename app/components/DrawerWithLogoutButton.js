@@ -10,12 +10,12 @@ export default DrawerWithLogoutButton = (props) => {
     _handleOnLogoutPress = () => {
         firebase.auth()
             .signOut()
-            .then(() => props.navigation.navigate('Loading'))
+            .then(() => props.navigation.navigate('SignInOptions', { title: 'Credentials', linkAccounts: false, onSignInSuccess: () => props.navigation.navigate('App') }))
             .catch((error) => console.log(error))
     }
 
     _handleOnLinkAccountsPress = () => {
-        props.navigation.navigate('Loading', { linkAccounts: true })
+        props.navigation.navigate('LinkAccount', { title: 'Link Accounts', linkAccounts: true })
     }
 
     return (

@@ -101,10 +101,8 @@ export default class LinkAccountScreen extends React.Component {
                     firebase.auth().currentUser && !this._existProvider(provider) &&
                     <FacebookLogin
                         text='LINK FACEBOOK'
-                        onSuccess={ok => {
-                            console.log('linked success')
-                        }}
-                        onError={err => console.log(err)}
+                        onSuccess={ok => this._showSnackBar(`Account linked`)}
+                        onError={err => this._showSnackBar(err.message)}
                         linkAccounts
                     />
                 }
@@ -117,7 +115,7 @@ export default class LinkAccountScreen extends React.Component {
                             if (onSignInSuccess)
                                 onSignInSuccess()
                         }}
-                        onError={err => console.log(err)}
+                        onError={err => this._showSnackBar(err.message)}
                     />
                 }
             </View>
