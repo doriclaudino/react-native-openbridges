@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "697298715042-smvh9154qdpcdfqqmlmoa2a0ll0nvied.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.doriclaudino.openbridges",
+            "certificate_hash": "f89e9465a3f6fcf6eeb98948f2852fca66b3c8ec"
+          }
+        },
+        {
           "client_id": "697298715042-ta9fsnved153fdsubmgu293q9kjjdh8i.apps.googleusercontent.com",
           "client_type": 3
         }
