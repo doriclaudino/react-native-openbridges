@@ -29,6 +29,7 @@ export default class PhoneScreen extends Component {
     constructor(props) {
         super(props);
         console.log(this.props)
+        this.unmount = false;
         this.state = {
             enterCode: false,
             spinner: false,
@@ -43,6 +44,11 @@ export default class PhoneScreen extends Component {
         };
     }
 
+    componentWillUnmount() {
+        this.unmount = true;
+    }
+
+
     static navigationOptions = ({ navigation }) => {
         return {
             title: navigation.getParam('title', 'Phone Sign-in')
@@ -51,27 +57,84 @@ export default class PhoneScreen extends Component {
 
     _getCode = () => {
         this.setState({ spinner: true }, this.refs.form.refs.textInput.blur());
-        try {
-            const { phoneNumber } = this.refs.form.getValues()
-            const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
-            firebase.auth().signInWithPhoneNumber(phoneNumberWithCountryCode, true)
-                .then(confirmResult => {
-                    this.setState({
-                        confirmResult,
-                        spinner: false,
-                        enterCode: true,
-                    },
-                        this.refs.form.refs.textInput.focus())
+        const { phoneNumber } = this.refs.form.getValues()
+        const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
+        this.unsubscribe = firebase.auth()
+            .verifyPhoneNumber(phoneNumberWithCountryCode)
+            .on('state_changed', (phoneAuthSnapshot) => {
+                // How you handle these state events is entirely up to your ui flow and whether
+                // you need to support both ios and android. In short: not all of them need to
+                // be handled - it's entirely up to you, your ui and supported platforms.
+
+                // E.g you could handle android specific events only here, and let the rest fall back
+                // to the optionalErrorCb or optionalCompleteCb functions
+                switch (phoneAuthSnapshot.state) {
+                    // ------------------------
+                    //  IOS AND ANDROID EVENTS
+                    // ------------------------
+                    case firebase.auth.PhoneAuthState.CODE_SENT: // or 'sent'
+                        console.log('code sent');
+                        // on ios this is the final phone auth state event you'd receive
+                        // so you'd then ask for user input of the code and build a credential from it
+                        // as demonstrated in the `signInWithPhoneNumber` example above
+                        this.setState({
+                            confirmResult: phoneAuthSnapshot,
+                            spinner: false,
+                            enterCode: true,
+                        },
+                            this.refs.form.refs.textInput.focus())
+                        break;
+                    case firebase.auth.PhoneAuthState.ERROR: // or 'error'
+                        console.log('verification error');
+                        console.log(phoneAuthSnapshot.error);
+                        this._showSnackBar(phoneAuthSnapshot.error.message, {
+                            label: 'Ok',
+                            onPress: () => {
+                                this.setState({ spinner: false });
+                                this && this.refs.form.refs.textInput.focus();
+                            },
+                        })
+                        break;
+
+                    // ---------------------
+                    // ANDROID ONLY EVENTS
+                    // ---------------------
+                    case firebase.auth.PhoneAuthState.AUTO_VERIFY_TIMEOUT: // or 'timeout'
+                        console.log('auto verify on android timed out');
+                        // proceed with your manual code input flow, same as you would do in
+                        // CODE_SENT if you were on IOS
+                        if (!this.unmount) {
+                            this.setState({
+                                confirmResult: phoneAuthSnapshot,
+                                spinner: false,
+                                enterCode: true,
+                            },
+                                this.refs.form.refs.textInput.focus())
+                        }
+                        break;
+                    case firebase.auth.PhoneAuthState.AUTO_VERIFIED:
+                        // phoneAuthSnapshot.code will contain the auto verified sms code - no need to ask the user for input.
+                        const { verificationId, code } = phoneAuthSnapshot;
+                        const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+                        this._signInOrLinkAccount(credential)
+                        break;
+                }
+            });
+    }
+
+    _signInOrLinkAccount = (credential) => {
+        if (firebase.auth().currentUser && linkAccounts) {
+            firebase.auth().currentUser.linkWithCredential(credential)
+                .then((ok) => {
+                    if (onSignInSuccess)
+                        onSignInSuccess(credential)
                 })
-                .catch(error => this._showSnackBar(error.message, {
-                    label: 'Ok',
-                    onPress: () => {
-                        this.setState({ spinner: false });
-                        this && this.refs.form.refs.textInput.focus();
-                    },
-                }))
-        } catch (err) {
-            this._showSnackBar(err.message)
+        } else {
+            firebase.auth().signInWithCredential(credential)
+                .then((ok) => {
+                    if (onSignInSuccess)
+                        onSignInSuccess(credential)
+                })
         }
     }
 
@@ -88,28 +151,7 @@ export default class PhoneScreen extends Component {
             const { code } = this.refs.form.getValues()
             if (confirmResult) {
                 const credential = await firebase.auth.PhoneAuthProvider.credential(confirmResult.verificationId, code)
-                if (firebase.auth().currentUser && linkAccounts) {
-                    firebase.auth().currentUser.linkWithCredential(credential)
-                        .then((ok) => {
-                            if (onSignInSuccess)
-                                onSignInSuccess(credential)
-                        })
-                } else {
-                    confirmResult.confirm(code)
-                        .then((user) => {
-                            if (onSignInSuccess)
-                                onSignInSuccess(credential)
-                        })
-                        .catch((error) => {
-                            this._showSnackBar(error.message, {
-                                label: 'Ok',
-                                onPress: () => {
-                                    this.setState({ spinner: false });
-                                    this && this.refs.form.refs.textInput.focus();
-                                },
-                            })
-                        })
-                }
+                this._signInOrLinkAccount(credential)
             } else
                 this.setState({ spinner: false });
         } catch (err) {
