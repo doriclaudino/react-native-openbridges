@@ -49,5 +49,11 @@ Project to track the DrawBridges status (up/down)
     * inside android run ./gradlew assembleRelease
 
 
+* release commands:
+    * cd android && ./gradlew assembleRelease
+    * output /android/app/build/outputs/apk/release/app-release.apk
+    * react-native run-android --variant=release
+
+
 for more:
 https://facebook.github.io/react-native/docs/debugging
