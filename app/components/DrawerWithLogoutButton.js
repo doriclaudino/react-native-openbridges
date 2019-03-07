@@ -1,8 +1,10 @@
 import React from 'react'
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { DrawerItems, SafeAreaView } from 'react-navigation';
-import { Button, Colors, } from "react-native-paper";
+import { Button, Colors, Avatar, IconButton } from "react-native-paper";
 import firebase from 'react-native-firebase';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 
 export default DrawerWithLogoutButton = (props) => {
@@ -18,31 +20,54 @@ export default DrawerWithLogoutButton = (props) => {
         props.navigation.navigate('LinkAccount', { title: 'Link Accounts', linkAccounts: true })
     }
 
+    _handleOpenBridges = () => {
+        console.log('_handleOpenBridges')
+        props.navigation.navigate('Bridges');
+        props.navigation.closeDrawer();
+    }
+
     return (
         < ScrollView contentContainerStyle={{ flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}>
             <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
-                <DrawerItems {...props} />
-            </SafeAreaView>
-            {
-                firebase.auth().currentUser &&
+
+
                 <View style={styles.container}>
+                    {
+                        firebase.auth().currentUser &&
+                        <View style={{
+                            flexDirection: 'row',
+                            width: '100%',
+                            alignItems: "center",
+                            justifyContent: "space-between"
+
+                        }}>
+                            <IconButton
+                                icon='exit-to-app'
+                                onPress={this._handleOnLogoutPress}
+                                size={20}
+                                color={`#6200ee`}
+                            ></IconButton>
+                            < IconButton
+                                icon='link'
+                                onPress={this._handleOnLinkAccountsPress}
+                                size={20}
+                                color={`#6200ee`}
+                            ></IconButton>
+
+                        </View>
+                    }
+                    <View style={{ flexDirection: 'row', height: 200, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <Avatar.Image style={{ selfAlign: 'center' }} size={150} source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }} />
+                    </View>
                     < Button
                         style={styles.button}
-                        icon='link'
+                        icon={() => <MaterialCommunityIcons name="bridge" size={24} color="white" />}
                         mode="contained"
-                        onPress={this._handleOnLinkAccountsPress}
-                        color={Colors.amber500}
-                    >Link Accounts</Button>
-
-                    <Button
-                        style={styles.button}
-                        icon='exit-to-app'
-                        mode="contained"
-                        color={Colors.red500}
-                        onPress={this._handleOnLogoutPress}
-                    >Logout</Button>
+                        onPress={this._handleOpenBridges}
+                        color={`#6200ee`}
+                    >BRIDGES</Button>
                 </View>
-            }
+            </SafeAreaView>
         </ScrollView >
     );
 }
