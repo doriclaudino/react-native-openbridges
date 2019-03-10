@@ -45,15 +45,16 @@ const distance = (loc1, loc2, unit) => {
   }
 }
 
-const isNearby = (loc1, loc2, definedDistance, unit) => {
-  let distanceBetween = distance(loc1, loc2, unit)
+const isNearby = (bridge, loc2, definedDistance, unit) => {
+  let distanceBetween = distance(bridge.geo, loc2, unit)
+  bridge.distance = distanceBetween
   return distanceBetween <= definedDistance
 }
 
 export const filterNameAndLocation = (bridge, nameContains: string, fromLocation, nearbyDistance, unit) => {
   if (nameContains && bridge.name.toUpperCase().indexOf(nameContains.toUpperCase()) === -1)
     return false
-  if (fromLocation && nearbyDistance && !isNearby(bridge.geo, fromLocation, nearbyDistance, unit))
+  if (fromLocation && nearbyDistance && !isNearby(bridge, fromLocation, nearbyDistance, unit))
     return false
   return true
 }

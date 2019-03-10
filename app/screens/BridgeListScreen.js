@@ -13,10 +13,10 @@ import {
     Image,
     Slider
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar, Chip } from 'react-native-paper';
 import { connect } from 'react-redux';
 
-import BridgeStatus from '../components/BridgeStatus';
+import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
@@ -28,7 +28,9 @@ const mapStateToProps = (state) => {
     loading = true
     filteredBridges = []
     if (state.ui && state.bridges && state.bridges.length) {
-        filteredBridges = state.bridges.filter(bridge => filterNameAndLocation(bridge, state.ui.searchBarValue, state.ui.currentUserLocation, state.ui.selectedDistance))
+        filteredBridges = state.bridges
+            .filter(bridge => filterNameAndLocation(bridge, state.ui.searchBarValue, state.ui.currentUserLocation, state.ui.selectedDistance))
+            .sort((a, b) => a.distance - b.distance)
         loading = false
     }
     return { ui: state.ui, loading, filteredBridges }
@@ -257,21 +259,7 @@ class BridgeListScreen extends Component {
                     data={filteredBridges}
                     extraData={filteredBridges}
                     keyExtractor={(item, index) => `${item.id}`}
-                    renderItem={({ item }) =>
-                        <View>
-                            <TouchableRipple onPress={() => this._onItemListClick('Detail', { bridge: item })} style={{ padding: 4 }}>
-                                <View style={{ flex: 1, flexDirection: 'row' }}>
-                                    <Image style={{ width: 100, height: 60, overflow: 'hidden', borderRadius: 10 }} source={{ uri: item.src }} />
-                                    <View style={{ flex: 1, flexDirection: 'column', flexGrow: 2, paddingHorizontal: 4 }}>
-                                        <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap" }}>{capitalizeSentence(item.name)}</Text>
-                                        <BridgeStatus bridge={item} />
-                                    </View>
-                                    <List.Icon icon="keyboard-arrow-right" />
-                                </View>
-                            </TouchableRipple>
-                            <Divider />
-                        </View>
-                    }
+                    renderItem={({ item }) => <BridgeItem bridge={item} onPress={() => this._onItemListClick('Detail', { bridge: item })} />}
                 />
                 {this._renderSnackBar()}
             </View>
