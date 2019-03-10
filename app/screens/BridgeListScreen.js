@@ -42,7 +42,6 @@ class BridgeListScreen extends Component {
     constructor(props) {
         super(props);
         gpsListener = {}
-        listenerTimeout = {}
         this.state = {}
         Snackbar.DURATION_SHORT = 2000
 
@@ -79,9 +78,9 @@ class BridgeListScreen extends Component {
                     <SliderAppbar
                         onCancelClick={params.onSliderLocationCloseClick}
                         disabled={!params.onDistanceChange}
-                        minimumValue={params?.sliderLocationOptions?.minimumValue}
-                        maximumValue={params?.sliderLocationOptions?.maximumValue}
-                        step={params?.sliderLocationOptions?.step}
+                        minimumValue={params ?.sliderLocationOptions ?.minimumValue}
+                        maximumValue={params ?.sliderLocationOptions ?.maximumValue}
+                        step={params ?.sliderLocationOptions ?.step}
                         onValueChange={(value) => {
                             params.onDistanceChange(value);
                             navigation.setParams({ selectedDistance: value });
@@ -109,19 +108,19 @@ class BridgeListScreen extends Component {
 
     componentWillReceiveProps({ ui, loading }) {
         if (!loading) {
-            if (this.props.navigation.getParam('sliderLocationOptions') !== ui?.sliderLocationOptions) {
+            if (this.props.navigation.getParam('sliderLocationOptions') !== ui ?.sliderLocationOptions) {
                 this.props.navigation.setParams({ sliderLocationOptions: ui.sliderLocationOptions });
             }
 
-            if (this.props.navigation.getParam('selectedDistance') !== ui?.selectedDistance) {
+            if (this.props.navigation.getParam('selectedDistance') !== ui ?.selectedDistance) {
                 this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
             }
 
-            if (this.props.navigation.getParam('currentUserLocation') !== ui?.currentUserLocation) {
+            if (this.props.navigation.getParam('currentUserLocation') !== ui ?.currentUserLocation) {
                 this.props.navigation.setParams({ currentUserLocation: ui.currentUserLocation });
             }
 
-            if (this.props.navigation.getParam('searchBarValue') !== ui?.searchBarValue) {
+            if (this.props.navigation.getParam('searchBarValue') !== ui ?.searchBarValue) {
                 this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
             }
         }
@@ -131,7 +130,11 @@ class BridgeListScreen extends Component {
     _onWatchUserLocationError = (error) => {
         this._updateLocationIcon(this.locationIcon.disable)
         navigator.geolocation.clearWatch(this.gpsListener)
-        this.listenerTimeout = setTimeout(() => this._watchUserPosition(), 3000)
+
+        if (this._existCurrentUserLocation())
+            this._showSnackBar('Using your old GPS location.', { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
+        else
+            this._showSnackBar('Location history not found.', { label: 'Turn ON', onPress: () => console.log('press turn on gps on settings') })
     }
 
     _sucessPosition = (pos) => {
@@ -141,13 +144,11 @@ class BridgeListScreen extends Component {
 
     componentWillUnmount = () => {
         navigator.geolocation.clearWatch(this.gpsListener)
-        clearTimeout(this.listenerTimeout)
     }
 
     componentWillMount = () => {
         this.props.fetchbridges();
         this.props.fetchOrCreateUI();
-        this.listenerTimeout = setTimeout(() => this._watchUserPosition(), 1000)
     }
 
     componentDidMount = () => {
@@ -163,7 +164,7 @@ class BridgeListScreen extends Component {
     }
 
     _onRequestLocationClick = () => {
-        this._getCurrentPositionOnce()
+        this._watchUserPosition()
     }
 
 
