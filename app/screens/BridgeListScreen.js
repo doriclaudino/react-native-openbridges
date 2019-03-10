@@ -78,7 +78,10 @@ class BridgeListScreen extends Component {
                 header: (
                     <SliderAppbar
                         onCancelClick={params.onSliderLocationCloseClick}
-                        disabled={!params.onDistanceChange}
+                        disabled={!params.onDistanceChange}                        
+                        minimumValue={params?.sliderLocationOptions?.minimumValue}
+                        maximumValue={params?.sliderLocationOptions?.maximumValue}
+                        step={params?.sliderLocationOptions?.step}     
                         onValueChange={(value) => {
                             params.onDistanceChange(value);
                             navigation.setParams({ selectedDistance: value });
@@ -106,6 +109,10 @@ class BridgeListScreen extends Component {
 
     componentWillReceiveProps({ ui, loading }) {
         if (!loading) {
+            if (ui.sliderLocationOptions && this.props.navigation.getParam('sliderLocationOptions') !== ui.sliderLocationOptions) {
+                this.props.navigation.setParams({ sliderLocationOptions: ui.sliderLocationOptions });
+            }
+
             if (ui.selectedDistance && this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance) {
                 this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
             }
