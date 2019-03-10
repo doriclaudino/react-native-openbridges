@@ -78,10 +78,10 @@ class BridgeListScreen extends Component {
                 header: (
                     <SliderAppbar
                         onCancelClick={params.onSliderLocationCloseClick}
-                        disabled={!params.onDistanceChange}                        
+                        disabled={!params.onDistanceChange}
                         minimumValue={params?.sliderLocationOptions?.minimumValue}
                         maximumValue={params?.sliderLocationOptions?.maximumValue}
-                        step={params?.sliderLocationOptions?.step}     
+                        step={params?.sliderLocationOptions?.step}
                         onValueChange={(value) => {
                             params.onDistanceChange(value);
                             navigation.setParams({ selectedDistance: value });
@@ -109,19 +109,19 @@ class BridgeListScreen extends Component {
 
     componentWillReceiveProps({ ui, loading }) {
         if (!loading) {
-            if (ui.sliderLocationOptions && this.props.navigation.getParam('sliderLocationOptions') !== ui.sliderLocationOptions) {
+            if (this.props.navigation.getParam('sliderLocationOptions') !== ui?.sliderLocationOptions) {
                 this.props.navigation.setParams({ sliderLocationOptions: ui.sliderLocationOptions });
             }
 
-            if (ui.selectedDistance && this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance) {
+            if (this.props.navigation.getParam('selectedDistance') !== ui?.selectedDistance) {
                 this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
             }
 
-            if (this.props.navigation.getParam('currentUserLocation') !== ui.currentUserLocation) {
+            if (this.props.navigation.getParam('currentUserLocation') !== ui?.currentUserLocation) {
                 this.props.navigation.setParams({ currentUserLocation: ui.currentUserLocation });
             }
 
-            if (ui.searchBarValue && this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue) {
+            if (this.props.navigation.getParam('searchBarValue') !== ui?.searchBarValue) {
                 this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
             }
         }
