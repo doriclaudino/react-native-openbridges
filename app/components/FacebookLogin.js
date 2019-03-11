@@ -11,12 +11,12 @@ export default class FacebookLogin extends React.Component {
             LoginManager.setLoginBehavior('NATIVE_ONLY');
             result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
                 .then(result => this._linkFacebookResult(result))
-        } catch (error) {
+        } catch (err) {
             try {
                 LoginManager.setLoginBehavior('WEB_ONLY');
                 result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
                     .then(result => this._linkFacebookResult(result))
-            } catch (error) {
+            } catch (err) {
                 this._onError(err)
             }
         }
