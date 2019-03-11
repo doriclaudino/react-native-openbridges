@@ -11,18 +11,18 @@ import {
     Text,
     FlatList,
     Image,
-    Slider
+    Slider,
+    PermissionsAndroid,
+    Animated
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar, Chip } from 'react-native-paper';
+import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar, Chip, Banner, Colors } from 'react-native-paper';
 import { connect } from 'react-redux';
-
 import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
 import { capitalizeSentence, filterNameAndLocation } from '../helpers'
 import { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation } from '../actions';
-import { PermissionsAndroid } from 'react-native';
 
 const mapStateToProps = (state) => {
     loading = true
@@ -42,10 +42,13 @@ class BridgeListScreen extends Component {
     constructor(props) {
         super(props);
         gpsListener = {}
-        this.state = {}
+        this.state = {
+            bannerVisible: false,
+            initialY: new Animated.Value(-300),
+        }
         Snackbar.DURATION_SHORT = 2000
 
-
+        this.bannerTimeout;
         this.gpsOptions = {
             enableHighAccuracy: false,
             timeout: 10000,
@@ -149,6 +152,7 @@ class BridgeListScreen extends Component {
     componentWillMount = () => {
         this.props.fetchbridges();
         this.props.fetchOrCreateUI();
+        clearTimeout(this.bannerTimeout)
     }
 
     componentDidMount = () => {
@@ -161,6 +165,13 @@ class BridgeListScreen extends Component {
             onSliderLocationCloseClick: this._flagSliderLocationVisible,
             locationIcon: this.locationIcon.pending,
         })
+
+        /**
+         * slide when user enter on Bridge GPS Boundary
+         */
+        this.bannerTimeout = setTimeout(() => {
+            this.slide()
+        }, 2000);
     }
 
     _onRequestLocationClick = () => {
@@ -250,8 +261,29 @@ class BridgeListScreen extends Component {
         )
     }
 
+    slide = () => {
+        const initialY = new Animated.Value(-300);
+        if (!this.state.bannerVisible) {
+            this.setState({
+                bannerVisible: true,
+            })
+            Animated.spring(this.state.initialY, {
+                speed: 1,
+                toValue: 0,
+            }).start();
+        } else {
+            this.setState({
+                bannerVisible: false,
+                initialY: new Animated.Value(-300),
+            });
+        }
+    };
+
+
     render() {
         const { filteredBridges, loading } = this.props
+
+
         if (loading)
             return (<View style={{
                 flex: 1,
@@ -262,6 +294,13 @@ class BridgeListScreen extends Component {
 
         return (
             <View style={styles.container}>
+                {
+                    this.state.bannerVisible &&
+                    <Animated.View style={[styles.animatedBanner, { transform: [{ translateY: this.state.initialY }] }]}>
+                        <Button onPress={() => this.slide()}>Hide</Button>
+                    </Animated.View>
+                }
+
                 <FlatList
                     style={styles.container}
                     data={filteredBridges}
@@ -270,7 +309,7 @@ class BridgeListScreen extends Component {
                     renderItem={({ item }) => <BridgeItem bridge={item} onPress={() => this._onItemListClick('Detail', { bridge: item })} />}
                 />
                 {this._renderSnackBar()}
-            </View>
+            </View >
         )
     }
 }
@@ -281,9 +320,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    animatedBanner: {
+        backgroundColor: Colors.yellow100, height: 100, width: '100%',
+    },
     item: { padding: 20 },
     itemContainer: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         backgroundColor: 'white',
         marginHorizontal: 10,
