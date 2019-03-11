@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
+import com.google.firebase.database.FirebaseDatabase;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
@@ -31,9 +32,11 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
-    FacebookSdk.sdkInitialize(getApplicationContext());
+    FacebookSdk.sdkInitialize(getApplicationContext());    
     // If you want to use AppEventsLogger to log events.
     AppEventsLogger.activateApp(this);
+
+    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
   }
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
