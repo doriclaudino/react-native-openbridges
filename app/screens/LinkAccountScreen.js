@@ -92,31 +92,34 @@ export default class LinkAccountScreen extends React.Component {
                 {
                     this._existProvider(provider) &&
                     <FacebookLogin
-                        text='UNLINK FACEBOOK'
                         onPress={() => this._unlinkProvider(provider)}
                         disabled={this.state.disableUnlink}
-                    />
+                    >
+                        UNLINK FACEBOOK
+                    </FacebookLogin>
                 }
                 {
                     firebase.auth().currentUser && !this._existProvider(provider) &&
                     <FacebookLogin
-                        text='LINK FACEBOOK'
                         onSuccess={() => this._showSnackBar(`Account linked`)}
                         onError={err => this._showSnackBar(err.message)}
                         linkAccounts
-                    />
+                    >
+                        LINK FACEBOOK
+                    </FacebookLogin>
                 }
                 {
                     !firebase.auth().currentUser &&
                     <FacebookLogin
-                        text='WITH FACEBOOK'
                         onSuccess={ok => {
                             console.log('signed, credential: ', ok);
                             if (onSignInSuccess)
                                 onSignInSuccess()
                         }}
                         onError={err => this._showSnackBar(err.message)}
-                    />
+                    >
+                        WITH FACEBOOK
+                    </FacebookLogin>
                 }
             </View>
         )
