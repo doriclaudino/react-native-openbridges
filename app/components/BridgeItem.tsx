@@ -4,11 +4,11 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import { Text, TouchableRipple, Divider, List, Colors } from 'react-native-paper';
 import { capitalizeSentence } from '../helpers';
 import BridgeStatus from './BridgeStatus';
-import typings from '../../typings'
+import { Bridge } from 'store/bridge';
 
 interface Props {
     onPress: () => any;
-    bridge: typings.Bridge
+    bridge: Bridge
 }
 
 export default class extends React.Component<Props> {
@@ -27,7 +27,7 @@ export default class extends React.Component<Props> {
                                     <Entypo name="direction" size={10} color="gray" />
                                 </Text>
                             </View>
-                            <BridgeStatus bridge />
+                            <BridgeStatus bridge={bridge} />
                         </View>
                         <List.Icon icon="keyboard-arrow-right" color={Colors.black} />
                     </View>
