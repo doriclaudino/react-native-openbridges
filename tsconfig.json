@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".", //generated types
-    "paths": { "*": ["types/*"] }, //generated types
+    "paths": { "*": ["typings/*"] }, //generated types
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

@@ -6,6 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
+  "typings": "typings/index.d.ts",
   "dependencies": {
     "moment": "^2.24.0",
     "react": "16.8.3",
