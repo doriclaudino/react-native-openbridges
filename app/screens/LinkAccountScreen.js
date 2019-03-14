@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
-import { View, StyleSheet } from 'react-native'
-import { Button, Text, Snackbar } from 'react-native-paper';
+import React from 'react'
+import { View } from 'react-native'
+import { Button, Snackbar } from 'react-native-paper';
 import firebase from 'react-native-firebase';
 import FacebookLogin from '../components/FacebookLogin'
 
@@ -44,7 +44,7 @@ export default class LinkAccountScreen extends React.Component {
         return this.state.providers.indexOf(name) > -1
     }
 
-    _onPhoneLinkSuccess = (credential) => {
+    _onPhoneLinkSuccess = () => {
         this.props.navigation.navigate('Loading', { linkAccounts: true })
     }
 
@@ -101,7 +101,7 @@ export default class LinkAccountScreen extends React.Component {
                     firebase.auth().currentUser && !this._existProvider(provider) &&
                     <FacebookLogin
                         text='LINK FACEBOOK'
-                        onSuccess={ok => this._showSnackBar(`Account linked`)}
+                        onSuccess={() => this._showSnackBar(`Account linked`)}
                         onError={err => this._showSnackBar(err.message)}
                         linkAccounts
                     />
@@ -162,10 +162,3 @@ export default class LinkAccountScreen extends React.Component {
     }
 }
 
-const styles = StyleSheet.create({
-    disclaimerText: {
-        marginTop: 30,
-        fontSize: 12,
-        color: 'grey'
-    }
-})

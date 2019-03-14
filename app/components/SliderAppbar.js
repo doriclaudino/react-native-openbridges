@@ -7,7 +7,7 @@ import {
 
 export default class extends React.Component {
     render() {
-        const { disabled, onValueChange, onCancelClick, value, showTitle, suffix, minimumValue = 1, maximumValue = 30, step = 1 } = this.props
+        const { onCancelClick, value, showTitle, suffix, minimumValue = 1, maximumValue = 30, step = 1 } = this.props
         return (
             <Appbar.Header>
                 <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>

@@ -1,21 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { createStackNavigator, createAppContainer, createDrawerNavigator, createSwitchNavigator } from "react-navigation";
 import BridgeListScreen from '../screens/BridgeListScreen';
 import BridgeDetailScreen from '../screens/BridgeDetailScreen';
 import PhoneScreen from '../screens/PhoneScreen';
-import SignInScreen from '../screens/SignInScreen';
 import CustomDrawerRender from '../components/DrawerWithLogoutButton'
 import LoadingScreen from '../screens/LoadingScreen';
 import LinkAccountScreen from '../screens/LinkAccountScreen';
 
-const PhoneAuthStack = createStackNavigator({
-    PhoneScreen: {
-        screen: PhoneScreen,
-        params: {
-            title: 'PhoneScreen',
-        }
-    },
-});
 
 const BridgeStack = createStackNavigator({
     List: {

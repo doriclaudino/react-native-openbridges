@@ -7,22 +7,16 @@
 import React, { Component } from 'react';
 
 import {
-    AppRegistry,
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
-    Platform,
-    ActivityIndicator,
-    Keyboard
-} from 'react-native';
+    Platform} from 'react-native';
 
 import Form from 'react-native-form';
-import { Appbar, Button, Snackbar } from 'react-native-paper';
+import { Button, Snackbar } from 'react-native-paper';
 import CountryPicker from 'react-native-country-picker-modal';
 import firebase from 'react-native-firebase';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 export default class PhoneScreen extends Component {
 
@@ -126,14 +120,14 @@ export default class PhoneScreen extends Component {
         const linkAccounts = this.props.navigation.getParam('linkAccounts', false)
         if (firebase.auth().currentUser && linkAccounts) {
             firebase.auth().currentUser.linkWithCredential(credential)
-                .then((ok) => {
+                .then(() => {
                     if (onSignInSuccess)
                         onSignInSuccess(credential)
                 })
                 .catch(error => this._showCodeError(error))
         } else {
             firebase.auth().signInWithCredential(credential)
-                .then((ok) => {
+                .then(() => {
                     if (onSignInSuccess)
                         onSignInSuccess(credential)
                 })
@@ -313,7 +307,6 @@ export default class PhoneScreen extends Component {
 }
 
 const MAX_LENGTH_CODE = 6;
-const MAX_LENGTH_NUMBER = 20;
 
 // if you want to customize the country picker
 const countryPickerCustomStyles = {};

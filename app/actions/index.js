@@ -1,5 +1,4 @@
 import firebase from 'react-native-firebase';
-import { parseToArrayWithId } from '../helpers'
 import ActionTypes from './ActionTypes'
 export default ActionTypes
 
@@ -13,7 +12,7 @@ const fetchBridgesSuccess = payload => ({
     payload,
 });
 
-export const setCurrentUserLocation = (currentUserLocation) => async dispatch => {
+export const setCurrentUserLocation = (currentUserLocation) => async () => {
     try {
         const { currentUser } = firebase.auth()
 
@@ -26,7 +25,7 @@ export const setCurrentUserLocation = (currentUserLocation) => async dispatch =>
     }
 };
 
-export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async dispatch => {
+export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async () => {
     try {
         console.log('addBridgeStatusThreshold')
         firebase.database()
@@ -37,7 +36,7 @@ export const addBridgeStatusThreshold = ({ bridge, statusThreshold }) => async d
     }
 };
 
-export const delBridgeEvent = ({ bridge, event }) => async dispatch => {
+export const delBridgeEvent = ({ bridge, event }) => async () => {
     try {
         console.log('delBridgeEvent')
         firebase.database().ref(`bridges/${bridge.id}/events/${event.id}`).remove()
@@ -46,7 +45,7 @@ export const delBridgeEvent = ({ bridge, event }) => async dispatch => {
     }
 };
 
-export const addBridgeEvent = ({ bridge, event }) => async dispatch => {
+export const addBridgeEvent = ({ bridge, event }) => async () => {
     try {
         console.log('addBridgeEvent')
         firebase.database().ref(`bridges/${bridge.id}/events`).push(event)
@@ -114,7 +113,7 @@ const defaultUISchema = {
     searchBarValue: ''
 }
 
-export const updatedSelectDistance = (selectedDistance) => async dispatch => {
+export const updatedSelectDistance = (selectedDistance) => async () => {
     try {
         const { uid } = firebase.auth().currentUser
         distanceRef = firebase.database().ref(`ui/${uid}/selectedDistance`)
@@ -124,7 +123,7 @@ export const updatedSelectDistance = (selectedDistance) => async dispatch => {
     }
 };
 
-export const updateSearchBarValue = (text) => async dispatch => {
+export const updateSearchBarValue = (text) => async () => {
     try {
         const { uid } = firebase.auth().currentUser
         distanceRef = firebase.database().ref(`ui/${uid}/searchBarValue`)

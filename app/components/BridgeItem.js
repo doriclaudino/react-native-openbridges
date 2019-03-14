@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Image } from 'react-native'
 import Entypo from 'react-native-vector-icons/Entypo'
-import { Chip, Card, Text, TouchableRipple, Divider, List } from 'react-native-paper';
+import { Text, TouchableRipple, Divider, List } from 'react-native-paper';
 import { capitalizeSentence } from '../helpers';
 import BridgeStatus from './BridgeStatus';
 

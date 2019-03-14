@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { View, } from 'react-native'
-import { Appbar, Button } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import firebase from 'react-native-firebase';
 
 export default class SignOutScreen extends React.Component {

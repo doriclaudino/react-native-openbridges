@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { View, } from 'react-native'
 import { Appbar, Button } from 'react-native-paper';
-import firebase from 'react-native-firebase';
 import FacebookLogin from '../components/FacebookLogin'
 
 export default class SignInScreen extends React.Component {

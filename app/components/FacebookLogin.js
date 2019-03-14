@@ -1,21 +1,16 @@
-import React, { Component } from 'react'
-import { Button, Text } from 'react-native-paper';
+import React from 'react'
+import { Button } from 'react-native-paper';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default class FacebookLogin extends React.Component {
         _signInOrLink = async () => {
-        let result;
         try {
             LoginManager.setLoginBehavior('NATIVE_ONLY');
-            result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-                .then(result => this._linkFacebookResult(result))
         } catch (err) {
             try {
                 LoginManager.setLoginBehavior('WEB_ONLY');
-                result = await LoginManager.logInWithReadPermissions(['public_profile', 'email'])
-                    .then(result => this._linkFacebookResult(result))
             } catch (err) {
                 this._onError(err)
             }

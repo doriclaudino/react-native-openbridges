@@ -1,7 +1,7 @@
 import React from 'react'
-import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
-import { DrawerItems, SafeAreaView } from 'react-navigation';
-import { Button, Colors, Avatar, IconButton } from "react-native-paper";
+import { View, StyleSheet, ScrollView } from 'react-native'
+import { SafeAreaView } from 'react-navigation';
+import { Button, Avatar, IconButton } from "react-native-paper";
 import firebase from 'react-native-firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 

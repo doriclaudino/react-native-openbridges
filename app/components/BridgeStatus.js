@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Text } from 'react-native'
-import { Chip, Card } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import Moment from 'react-moment';
 
 
@@ -81,7 +81,6 @@ export default class extends React.Component {
         statusThreshold = bridge.statusThreshold || 10;
         lastEvent = bridge.events.filter(event => event && new Date() > new Date(event.when)).sort((a, b) => { return new Date(b.when) - new Date(a.when); })[0] || undefined
         if (lastEvent) {
-            let when = lastEvent.when
             if (lastEvent) {
                 let when = lastEvent.when
                 if (this.isClose(lastEvent))

@@ -8,20 +8,17 @@ import React, { Component } from 'react'
 import {
     StyleSheet,
     View,
-    Text,
     FlatList,
-    Image,
-    Slider,
     PermissionsAndroid,
     Animated
 } from 'react-native'
-import { Appbar, Divider, List, TouchableRipple, Button, ActivityIndicator, Snackbar, Chip, Banner, Colors } from 'react-native-paper';
+import { Appbar, Button, ActivityIndicator, Snackbar, Colors } from 'react-native-paper';
 import { connect } from 'react-redux';
 import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
 import SliderAppbar from '../components/SliderAppbar';
 import SearchAppbar from '../components/SearchAppbar';
-import { capitalizeSentence, filterNameAndLocation } from '../helpers'
+import { filterNameAndLocation } from '../helpers'
 import { fetchbridges, fetchOrCreateUI, updatedSelectDistance, updateSearchBarValue, setCurrentUserLocation } from '../actions';
 
 const mapStateToProps = (state) => {
@@ -76,14 +73,20 @@ class BridgeListScreen extends Component {
                 )
             })
         } else if (params.isSliderLocationVisible) {
+            let minimumValue, maximumValue, step = null;
+            if (params.sliderLocationOptions) {
+                minimumValue = params.sliderLocationOptions.minimumValue
+                maximumValue = params.sliderLocationOptions.maximumValue
+                step = params.sliderLocationOptions.step
+            }
             return ({
                 header: (
                     <SliderAppbar
                         onCancelClick={params.onSliderLocationCloseClick}
                         disabled={!params.onDistanceChange}
-                        minimumValue={params ?.sliderLocationOptions ?.minimumValue}
-                        maximumValue={params ?.sliderLocationOptions ?.maximumValue}
-                        step={params ?.sliderLocationOptions ?.step}
+                        minimumValue={minimumValue}
+                        maximumValue={maximumValue}
+                        step={step}
                         onValueChange={(value) => {
                             params.onDistanceChange(value);
                             navigation.setParams({ selectedDistance: value });
@@ -111,26 +114,26 @@ class BridgeListScreen extends Component {
 
     componentWillReceiveProps({ ui, loading }) {
         if (!loading) {
-            if (this.props.navigation.getParam('sliderLocationOptions') !== ui ?.sliderLocationOptions) {
+            if (this.props.navigation.getParam('sliderLocationOptions') !== ui.sliderLocationOptions) {
                 this.props.navigation.setParams({ sliderLocationOptions: ui.sliderLocationOptions });
             }
 
-            if (this.props.navigation.getParam('selectedDistance') !== ui ?.selectedDistance) {
+            if (this.props.navigation.getParam('selectedDistance') !== ui.selectedDistance) {
                 this.props.navigation.setParams({ selectedDistance: ui.selectedDistance });
             }
 
-            if (this.props.navigation.getParam('currentUserLocation') !== ui ?.currentUserLocation) {
+            if (this.props.navigation.getParam('currentUserLocation') !== ui.currentUserLocation) {
                 this.props.navigation.setParams({ currentUserLocation: ui.currentUserLocation });
             }
 
-            if (this.props.navigation.getParam('searchBarValue') !== ui ?.searchBarValue) {
+            if (this.props.navigation.getParam('searchBarValue') !== ui.searchBarValue) {
                 this.props.navigation.setParams({ searchBarValue: ui.searchBarValue });
             }
         }
     }
 
 
-    _onWatchUserLocationError = (error) => {
+    _onWatchUserLocationError = () => {
         this._updateLocationIcon(this.locationIcon.disable)
         navigator.geolocation.clearWatch(this.gpsListener)
 
@@ -262,7 +265,6 @@ class BridgeListScreen extends Component {
     }
 
     slide = () => {
-        const initialY = new Animated.Value(-300);
         if (!this.state.bannerVisible) {
             this.setState({
                 bannerVisible: true,
@@ -305,7 +307,7 @@ class BridgeListScreen extends Component {
                     style={styles.container}
                     data={filteredBridges}
                     extraData={filteredBridges}
-                    keyExtractor={(item, index) => `${item.id}`}
+                    keyExtractor={(item) => `${item.id}`}
                     renderItem={({ item }) => <BridgeItem bridge={item} onPress={() => this._onItemListClick('Detail', { bridge: item })} />}
                 />
                 {this._renderSnackBar()}
