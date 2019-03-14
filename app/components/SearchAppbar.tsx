@@ -1,12 +1,16 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { View, TextInputProps } from 'react-native';
 import {
     Appbar,
 } from 'react-native-paper';
 import Searchbar from './SearchBar'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
-export default class extends React.Component {
+interface Props extends TextInputProps {
+    onIconPress: () => void
+}
+
+export default class extends React.Component<Props> {
     render() {
         return (
             <Appbar.Header>
