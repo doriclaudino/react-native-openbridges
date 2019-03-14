@@ -28,4 +28,4 @@ export interface IStatus {
     status: string
 }
 
-
+export type TBridgeStatus = "Open" | "Close";

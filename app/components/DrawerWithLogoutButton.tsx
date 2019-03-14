@@ -1,11 +1,11 @@
 import React from 'react'
 import { View, StyleSheet, ScrollView } from 'react-native'
-import { SafeAreaView, NavigationScreenProps } from 'react-navigation';
+import { SafeAreaView, DrawerItemsProps } from 'react-navigation';
 import { Button, Avatar, IconButton } from "react-native-paper";
 import firebase from 'react-native-firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-interface Props extends NavigationScreenProps<{}> { }
+interface Props extends DrawerItemsProps { }
 interface RouteParams {
     linkAccounts?: boolean,
     title?: string,

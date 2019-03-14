@@ -8,21 +8,17 @@ import {
     RadioButton,
     TouchableRipple,
 } from 'react-native-paper';
+import { TBridgeStatus } from 'store/bridge';
 
 interface Props {
-    checked: TypeChecked
+    checked: TBridgeStatus
     visible: boolean
     onClose: () => void
-    onConfirm: (checked: TypeChecked) => void
-}
-
-enum TypeChecked {
-    open = 'Open',
-    close = 'Close',
+    onConfirm: (checked: TBridgeStatus) => void
 }
 
 interface State {
-    checked: TypeChecked
+    checked: TBridgeStatus
 }
 
 export default class extends React.Component<Props, State> {
@@ -41,26 +37,26 @@ export default class extends React.Component<Props, State> {
                         <ScrollView>
                             <View>
                                 <TouchableRipple
-                                    onPress={() => this.setState({ checked: TypeChecked.open })}
+                                    onPress={() => this.setState({ checked: 'Open' })}
                                 >
                                     <View style={styles.row}>
                                         <View pointerEvents="none">
                                             <RadioButton
-                                                value={TypeChecked.open}
-                                                status={checked === TypeChecked.open ? 'checked' : 'unchecked'}
+                                                value={'Open'}
+                                                status={checked === 'Open' ? 'checked' : 'unchecked'}
                                             />
                                         </View>
                                         <Subheading style={styles.text}>Open</Subheading>
                                     </View>
                                 </TouchableRipple>
                                 <TouchableRipple
-                                    onPress={() => this.setState({ checked: TypeChecked.close })}
+                                    onPress={() => this.setState({ checked: 'Close' })}
                                 >
                                     <View style={styles.row}>
                                         <View pointerEvents="none">
                                             <RadioButton
-                                                value={TypeChecked.close}
-                                                status={checked === TypeChecked.close ? 'checked' : 'unchecked'}
+                                                value={'Close'}
+                                                status={checked === 'Close' ? 'checked' : 'unchecked'}
                                             />
                                         </View>
                                         <Subheading style={styles.text}>Close</Subheading>
