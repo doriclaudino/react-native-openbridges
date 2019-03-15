@@ -23,7 +23,7 @@ export default class extends React.Component<Props> {
                             <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, color: 'black', flexWrap: "wrap" }}>{capitalizeSentence(bridge.name)}</Text>
                             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'flex-start', alignItems: 'flex-start' }}>
                                 <Text numberOfLines={1} style={{ flex: 1, fontSize: 10, color: 'gray', flexWrap: "wrap" }}>
-                                    {bridge.distance.toFixed(2)}
+                                    {bridge.distance && bridge.distance.toFixed(2)}
                                     <Entypo name="direction" size={10} color="gray" />
                                 </Text>
                             </View>

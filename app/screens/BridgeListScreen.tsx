@@ -64,14 +64,14 @@ enum locationIcons {
     enable = 'my-location'
 }
 
-const mapStateToProps = (state: MapState) => {
+const mapStateToProps = (state: MapState, ownProps: Props) => {
     let loading = true, filteredBridges: Bridge[] = []
     if (state.ui && state.bridges && state.bridges.length) {
         filteredBridges = state.bridges
             .filter(bridge => filterNameAndLocation(bridge, state.ui.searchBarValue, state.ui.currentUserLocation, state.ui.selectedDistance))
             .sort((a, b) => a.distance - b.distance)
-        loading = false
     }
+    loading = false
     return { ui: state.ui, loading, filteredBridges: filteredBridges }
 }
 
@@ -108,7 +108,6 @@ class BridgeListScreen extends Component<Props, State> {
         const onRequestLocationClick = navigation.getParam('onRequestLocationClick', undefined)
         const locationIcon = navigation.getParam('locationIcon', undefined)
 
-        console.log(onSearchClick)
         if (isSearchBarVisible) {
             return ({
                 header: (
@@ -160,23 +159,22 @@ class BridgeListScreen extends Component<Props, State> {
     };
 
 
+    compareNavigationParamAndUpdate = (newProps: Props, fields: string[]) => {
+        if (newProps.ui) {
+            fields.forEach(field => {
+                const oldNavParam = this.props.navigation.getParam(field)
+                if (newProps.ui[field] && oldNavParam !== newProps.ui[field]) {
+                    console.log('updating :', field)
+                    newProps.navigation.setParams({ [field]: newProps.ui[field] })
+                }
+            })
+        }
+    }
+
     componentWillReceiveProps(props: Props) {
-        if (!props!.loading) {
-            if (this.props.navigation.getParam('sliderLocationOptions') !== props!.ui!.sliderLocationOptions) {
-                this.props.navigation.setParams({ sliderLocationOptions: props!.ui!.sliderLocationOptions });
-            }
-
-            if (this.props.navigation.getParam('selectedDistance') !== props!.ui!.selectedDistance) {
-                this.props.navigation.setParams({ selectedDistance: props!.ui!.selectedDistance });
-            }
-
-            if (this.props.navigation.getParam('currentUserLocation') !== props!.ui!.currentUserLocation) {
-                this.props.navigation.setParams({ currentUserLocation: props!.ui!.currentUserLocation });
-            }
-
-            if (this.props.navigation.getParam('searchBarValue') !== props!.ui!.searchBarValue) {
-                this.props.navigation.setParams({ searchBarValue: props!.ui!.searchBarValue });
-            }
+        const isLoading = props.loading
+        if (!isLoading) {
+            this.compareNavigationParamAndUpdate(props, ['sliderLocationOptions', 'selectedDistance', 'currentUserLocation', 'searchBarValue'])
         }
     }
 

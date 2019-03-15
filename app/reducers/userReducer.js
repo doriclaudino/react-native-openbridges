@@ -10,6 +10,6 @@ export const userReducer = (state = [], action) => {
         case ActionTypes.UPDATE_SELECTED_DISTANCE:
             return { ...state, selectedDistance: action.payload };
         default:
-            return null;
+            return { ...state };
     }
 };
