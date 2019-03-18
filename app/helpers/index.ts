@@ -56,7 +56,7 @@ export const filterNameAndLocation = (
   nameContains: string,
   fromLocation: GeolocationReturnType,
   nearbyDistance: number,
-  unit: string
+  unit?: string
 ) => {
   if (nameContains && bridge.name.toUpperCase().indexOf(nameContains.toUpperCase()) === -1) {
     return false
