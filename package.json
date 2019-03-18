@@ -65,7 +65,7 @@
     "cacheDirectory": ".jest/cache"
   },
   "lint-staged": {
-    "{src,test}/**/*.ts*": [
+    "{src,test,app}/**/*.ts*": [
       "prettier --write",
       "git add"
     ]
