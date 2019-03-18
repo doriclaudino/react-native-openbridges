@@ -1,18 +1,36 @@
 {
-  "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-config-airbnb", "tslint-react"],
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-prettier",
+    "tslint-config-airbnb",
+    "tslint-react"
+  ],
   "defaultSeverity": "error",
   "jsRules": {},
   "rules": {
-    "member-access": [true, "no-public"],
+    "member-access": [
+      true,
+      "no-public"
+    ],
     "import-name": false,
-    "quotemark": [true, "single", "jsx-double"],
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ],
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "arrow-parens": false,
-    "no-console": [false],
+    "no-console": [
+      false
+    ],
     "no-unused-expression": true,
     "comment-format": false,
-    "semicolon": [true, "never", "ignore-interfaces"],
+    "semicolon": [
+      true,
+      "never",
+      "ignore-interfaces"
+    ],
     "trailing-comma": [
       true,
       {
@@ -21,7 +39,8 @@
           "arrays": "always",
           "functions": "ignore",
           "typeLiterals": "ignore"
-        }
+        },
+        "esSpecCompliant": true
       }
     ],
     "no-shadowed-variable": false,
@@ -31,21 +50,38 @@
     "curly": true,
     "eofline": true,
     "forin": true,
-    "indent": [true, "spaces", 2],
-    "interface-name": [true, "never-prefix"],
+    "indent": [
+      true,
+      "spaces",
+      2
+    ],
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
     "jsdoc-format": true,
     "jsx-no-lambda": false,
     "jsx-no-multiline-js": false,
     "react/jsx-boolean-value": true,
     "label-position": true,
-    "max-line-length": [true, 120],
+    "max-line-length": [
+      true,
+      120
+    ],
     "member-ordering": false,
     "no-any": false,
     "no-arg": true,
     "no-switch-case-fall-through": true,
     "switch-default": true,
-    "triple-equals": [true, "allow-null-check"],
-    "typedef": [true, "parameter", "property-declaration"],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "typedef": [
+      true,
+      "parameter",
+      "property-declaration"
+    ],
     "typedef-whitespace": [
       true,
       {
@@ -56,7 +92,13 @@
         "variable-declaration": "nospace"
       }
     ],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ],
     "whitespace": [
       true,
       "check-branch",
