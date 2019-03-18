@@ -21,7 +21,7 @@ export const capitalizeSentence = (sentence: string) => {
   return sentence.toLowerCase().split(' ').map((a) => { a.charAt(0).toUpperCase().concat(a.substr(1)) }).join(' ')
 }
 
-const distance = (loc1: BridgeGeoLocation, loc2: GeolocationReturnType, unit: string) => {
+const distance = (loc1: BridgeGeoLocation, loc2: GeolocationReturnType, unit?: string) => {
   const lat1 = loc1.lat
   const lon1 = loc1.lng
   const lat2 = loc2.coords.latitude
@@ -45,7 +45,7 @@ const distance = (loc1: BridgeGeoLocation, loc2: GeolocationReturnType, unit: st
   return dist
 }
 
-const isNearby = (bridge: Bridge, loc2: GeolocationReturnType, definedDistance: number, unit: string) => {
+const isNearby = (bridge: Bridge, loc2: GeolocationReturnType, definedDistance: number, unit?: string) => {
   const distanceBetween = distance(bridge.geo, loc2, unit)
   bridge.distance = distanceBetween
   return distanceBetween <= definedDistance
