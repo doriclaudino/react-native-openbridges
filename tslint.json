@@ -3,6 +3,8 @@
   "defaultSeverity": "error",
   "jsRules": {},
   "rules": {
+    "member-access": [true, "no-public"],
+    "import-name": false,
     "quotemark": [true, "single", "jsx-double"],
     "ordered-imports": false,
     "object-literal-sort-keys": false,
