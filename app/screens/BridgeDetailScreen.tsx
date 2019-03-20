@@ -54,11 +54,12 @@ class BridgeDetailScreen extends React.Component<Props, State> {
   }
 
   static navigationOptions = ({ navigation }: NavigationScreenProps<NavigationParams>) => {
+    const bridge: Bridge = navigation.getParam('bridge')
     return {
       header: (
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack()} />
-          <Appbar.Content title={capitalizeSentence(navigation.state.params!.bridge.name)} />
+          <Appbar.Content title={capitalizeSentence(bridge.name)} />
           <Appbar.Action
             icon="settings"
             disabled={!navigation.state.params!.onDialogSliderClick}

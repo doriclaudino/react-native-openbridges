@@ -18,7 +18,12 @@ export const parseToArrayWithId = (obj: any) => {
 }
 
 export const capitalizeSentence = (sentence: string) => {
-  return sentence.toLowerCase().split(' ').map((a) => { a.charAt(0).toUpperCase().concat(a.substr(1)) }).join(' ')
+  return sentence.toLowerCase()
+    .split(' ')
+    .map((toLowerWord) => {
+      return toLowerWord.charAt(0).toUpperCase().concat(toLowerWord.substr(1))
+    })
+    .join(' ')
 }
 
 const distance = (loc1: BridgeGeoLocation, loc2: GeolocationReturnType, unit?: string) => {
