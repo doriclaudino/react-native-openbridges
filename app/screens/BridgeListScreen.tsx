@@ -250,10 +250,13 @@ class BridgeListScreen extends React.Component<Props, State> {
     /**
      * slide when user enter on Bridge GPS Boundary
      */
+    /*
     const bannerTimeout = setTimeout(() => {
       this.slide()
     }, 2000)
     this.setState({ bannerTimeout })
+    */
+
   }
 
   _onRequestLocationClick = () => {
