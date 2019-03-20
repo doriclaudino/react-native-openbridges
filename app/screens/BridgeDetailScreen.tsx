@@ -141,7 +141,7 @@ class BridgeDetailScreen extends React.Component<Props, State> {
               renderItem={({ item }) => <View><Divider />
                 <List.Item
                   title={item.status}
-                  description={(<Moment element={Text} format={'llll'}>{item.when.toISOString()}</Moment>)}
+                  description={(<Moment element={Text} format={'llll'}>{item.when.toString()}</Moment>)}
                   left={() => (
                     <TouchableRipple>
                       <List.Icon
