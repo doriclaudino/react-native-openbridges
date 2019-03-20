@@ -133,10 +133,17 @@ export default class extends React.Component<Props> {
     const showStatus = this.getBridgeStatus(bridge)
     return (
       <Card.Content style={{ backgroundColor: showStatus.color, paddingBottom: 0 }}>
-        <Text>
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 12,
+            fontWeight: 'bold',
+            fontFamily: 'Courier',
+          }}
+        >
           {showStatus.status}
           {showStatus.when &&
-            <Moment element={Text} fromNow={true}>
+            <Moment element={Text} fromNow={true} >
               {showStatus.when.toISOString()}
             </Moment>
           }
