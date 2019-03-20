@@ -63,7 +63,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _getCode = () => {
-    this.setState({ spinner: true }, this.textInput.current.blur())
+    this.setState({ spinner: true }, () => { this.blurText() })
     const phoneNumber = this.state.textInputValue
     const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
     this.unsubscribe = firebase.auth()
@@ -88,8 +88,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
               confirmResult: phoneAuthSnapshot,
               spinner: false,
               enterCode: true,
-            },
-              this.textInput.current.focus())
+            }, () => { this.focusText() })
             break
           case firebase.auth.PhoneAuthState.ERROR: // or 'error'
             console.log('verification error')
@@ -99,9 +98,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
                 label: 'Ok',
                 onPress: () => {
                   this.setState({ spinner: false })
-                  if (this) {
-                    this.textInput.current.focus()
-                  }
+                  this.focusText()
                 },
               })
             }
@@ -119,8 +116,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
                 confirmResult: phoneAuthSnapshot,
                 spinner: false,
                 enterCode: true,
-              },
-                this.textInput.current.focus())
+              }, () => { this.focusText() })
             }
             break
           case firebase.auth.PhoneAuthState.AUTO_VERIFIED:
@@ -164,9 +160,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
       label: 'Ok',
       onPress: () => {
         this.setState({ spinner: false })
-        if (this) {
-          this.textInput.current.focus()
-        }
+        this.focusText()
       },
     })
   }
@@ -176,7 +170,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _verifyCode = async () => {
-    this.setState({ spinner: true }, this.textInput.current.blur())
+    this.setState({ spinner: true }, () => { this.blurText() })
     try {
       const { confirmResult } = this.state
       const code = this.state.textInputValue
@@ -200,8 +194,10 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _tryAgain = () => {
-    this.textInput.current.setNativeProps({ text: '' })
-    this.textInput.current.focus()
+    if (this.textInput.current) {
+      this.textInput.current.setNativeProps({ text: '' })
+      this.textInput.current.focus()
+    }
     this.setState({ enterCode: false, spinner: false })
   }
 
@@ -211,7 +207,19 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
 
   _changeCountry = (country: any) => {
     this.setState({ country })
-    this.textInput.current.focus()
+    this.focusText()
+  }
+
+  blurText = (RefElement: React.RefObject<TextInput> = this.textInput): void => {
+    if (RefElement.current) {
+      RefElement.current.blur()
+    }
+  }
+
+  focusText = (RefElement: React.RefObject<TextInput> = this.textInput): void => {
+    if (RefElement.current) {
+      RefElement.current.focus()
+    }
   }
 
   _renderFooter = () => {
@@ -234,7 +242,6 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
         </Text>
       </View>
     )
-
   }
 
   _renderCountryPicker = () => {
@@ -300,42 +307,42 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
 
         <Text style={styles.header}>{headerText}</Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20 }}>
-            {/** fix 60 px to stop button/children moving around */}
-            <View style={{ minHeight: 50 }} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20 }}>
+          {/** fix 60 px to stop button/children moving around */}
+          <View style={{ minHeight: 50 }} />
 
-            {this._renderCountryPicker()}
-            {this._renderCallingCode()}
-            <TextInput
-              ref={this.textInput}
-              underlineColorAndroid={'transparent'}
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              onChangeText={this._onChangeText}
-              placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
-              keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-              style={Object.assign({}, styles.textInput, textStyle)}
-              returnKeyType="go"
-              autoFocus={true}
-              placeholderTextColor={brandColor}
-              selectionColor={brandColor}
-              maxLength={this.state.enterCode ? 6 : 20}
-              onSubmitEditing={this._getSubmitAction}
-              blurOnSubmit={true}
-            />
-          </View>
-          <Button
-            mode="contained"
-            disabled={this.state.spinner}
-            style={{ marginTop: 20, }}
-            icon={() => <MaterialIcons name="add-a-photo" color="#744BAC" />}
-            loading={this.state.spinner}
-            onPress={this._getSubmitAction}
-            color="#744BAC"
-          >
-            {buttonText}
-          </Button>
-          {this._renderFooter()}
+          {this._renderCountryPicker()}
+          {this._renderCallingCode()}
+          <TextInput
+            ref={this.textInput}
+            underlineColorAndroid={'transparent'}
+            autoCapitalize={'none'}
+            autoCorrect={false}
+            onChangeText={this._onChangeText}
+            placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
+            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+            style={Object.assign({}, styles.textInput, textStyle)}
+            returnKeyType="go"
+            autoFocus={true}
+            placeholderTextColor={brandColor}
+            selectionColor={brandColor}
+            maxLength={this.state.enterCode ? 6 : 20}
+            onSubmitEditing={this._getSubmitAction}
+            blurOnSubmit={true}
+          />
+        </View>
+        <Button
+          mode="contained"
+          disabled={this.state.spinner}
+          style={{ marginTop: 20, }}
+          icon={() => <MaterialIcons name="add-a-photo" color="#744BAC" />}
+          loading={this.state.spinner}
+          onPress={this._getSubmitAction}
+          color="#744BAC"
+        >
+          {buttonText}
+        </Button>
+        {this._renderFooter()}
         {this._renderSnackBar()}
       </View>
     )
