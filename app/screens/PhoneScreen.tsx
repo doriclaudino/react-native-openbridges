@@ -12,7 +12,6 @@ import {
   View,
   Platform
 } from 'react-native'
-import Form from 'react-native-form'
 import { Button, Snackbar } from 'react-native-paper'
 import CountryPicker, { CallingCode, CCA2Code } from 'react-native-country-picker-modal'
 import firebase, { RNFirebase, AuthCredential } from 'react-native-firebase'
@@ -31,7 +30,8 @@ interface State {
   snackBarMessage?: string
   snackBarAction?: object | any
   snackBarVisible: boolean
-  confirmResult: RNFirebase.PhoneAuthSnapshot | undefined
+  confirmResult: RNFirebase.PhoneAuthSnapshot | undefined,
+  textInputValue: string,
 }
 
 export default class PhoneScreen extends React.Component<NavigationScreenProps, State> {
@@ -48,8 +48,8 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
     snackBarVisible: false,
     snackBarAction: undefined,
     confirmResult: undefined,
+    textInputValue: '',
   }
-  form = React.createRef<Form>()
   textInput = React.createRef<TextInput>()
 
   componentWillUnmount() {
@@ -63,8 +63,8 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _getCode = () => {
-    this.setState({ spinner: true }, this.textInput.blur())
-    const { phoneNumber } = this.form.getValues()
+    this.setState({ spinner: true }, this.textInput.current.blur())
+    const phoneNumber = this.state.textInputValue
     const phoneNumberWithCountryCode = `+${this.state.country.callingCode} ${phoneNumber}`
     this.unsubscribe = firebase.auth()
       .verifyPhoneNumber(phoneNumberWithCountryCode)
@@ -89,7 +89,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
               spinner: false,
               enterCode: true,
             },
-              this.textInput.focus())
+              this.textInput.current.focus())
             break
           case firebase.auth.PhoneAuthState.ERROR: // or 'error'
             console.log('verification error')
@@ -100,7 +100,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
                 onPress: () => {
                   this.setState({ spinner: false })
                   if (this) {
-                    this.textInput.focus()
+                    this.textInput.current.focus()
                   }
                 },
               })
@@ -120,7 +120,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
                 spinner: false,
                 enterCode: true,
               },
-                this.textInput.focus())
+                this.textInput.current.focus())
             }
             break
           case firebase.auth.PhoneAuthState.AUTO_VERIFIED:
@@ -165,7 +165,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
       onPress: () => {
         this.setState({ spinner: false })
         if (this) {
-          this.textInput.focus()
+          this.textInput.current.focus()
         }
       },
     })
@@ -176,10 +176,10 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _verifyCode = async () => {
-    this.setState({ spinner: true }, this.textInput.blur())
+    this.setState({ spinner: true }, this.textInput.current.blur())
     try {
       const { confirmResult } = this.state
-      const { code } = this.form.getValues()
+      const code = this.state.textInputValue
       if (confirmResult) {
         const credential = await firebase.auth.PhoneAuthProvider.credential(confirmResult.verificationId, code)
         this._signInOrLinkAccount(credential)
@@ -192,6 +192,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _onChangeText = (val: string) => {
+    this.setState({ textInputValue: val })
     if (!this.state.enterCode) { return }
     if (val.length === MAX_LENGTH_CODE) {
       this._verifyCode()
@@ -199,8 +200,8 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   }
 
   _tryAgain = () => {
-    this.textInput.setNativeProps({ text: '' })
-    this.textInput.focus()
+    this.textInput.current.setNativeProps({ text: '' })
+    this.textInput.current.focus()
     this.setState({ enterCode: false, spinner: false })
   }
 
@@ -210,7 +211,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
 
   _changeCountry = (country: any) => {
     this.setState({ country })
-    this.textInput.focus()
+    this.textInput.current.focus()
   }
 
   _renderFooter = () => {
@@ -248,7 +249,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
       <CountryPicker
         closeable={true}
         showCallingCode={true}
-        styles={[countryPickerCustomStyles, styles.countryPicker]}
+        styles={styles.countryPicker}
         onChange={this._changeCountry}
         cca2={this.state.country.cca2}
         translation="common"
@@ -286,15 +287,12 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
   render() {
     const headerText = `What's your ${this.state.enterCode ? 'verification code' : 'phone number'}?`
     const buttonText = this.state.enterCode ? 'Verify confirmation code' : 'Send confirmation code'
-    const style: any = [styles.textInput]
-    if (this.state.enterCode) {
-      style.concat({
-        textAlign: 'center',
-        fontSize: 40,
-        fontWeight: 'bold',
-        fontFamily: 'Courier',
-      })
-    }
+    const textStyle = this.state.enterCode ? {
+      textAlign: 'center',
+      fontSize: 40,
+      fontWeight: 'bold',
+      fontFamily: 'Courier',
+    } : {}
 
     return (
 
@@ -302,10 +300,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
 
         <Text style={styles.header}>{headerText}</Text>
 
-        <Form ref={this.form} style={styles.form}>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-
+          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20 }}>
             {/** fix 60 px to stop button/children moving around */}
             <View style={{ minHeight: 50 }} />
 
@@ -319,7 +314,7 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
               onChangeText={this._onChangeText}
               placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
               keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-              style={style}
+              style={Object.assign({}, styles.textInput, textStyle)}
               returnKeyType="go"
               autoFocus={true}
               placeholderTextColor={brandColor}
@@ -341,7 +336,6 @@ export default class PhoneScreen extends React.Component<NavigationScreenProps, 
             {buttonText}
           </Button>
           {this._renderFooter()}
-        </Form>
         {this._renderSnackBar()}
       </View>
     )
@@ -371,9 +365,6 @@ const styles = StyleSheet.create({
     margin: 20,
     color: '#4A4A4A',
   },
-  form: {
-    margin: 20,
-  },
   textInput: {
     padding: 0,
     margin: 0,
@@ -401,9 +392,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   disclaimerText: {
-    marginTop: 30,
+    marginTop: 10,
     fontSize: 12,
     color: 'grey',
+    textAlign: 'center',
   },
   callingCodeView: {
     alignItems: 'center',
