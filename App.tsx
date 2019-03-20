@@ -10,7 +10,7 @@
 
 import React from 'react'
 import { Provider as ReduxProvider } from 'react-redux'
-import { store } from './app/store/BridgeStore'
+import store from './app/store/BridgeStore'
 import { Provider as PaperProvider } from 'react-native-paper'
 import RootNavigation from './app/navigation/RootNavigation'
 import firebase from 'react-native-firebase'
