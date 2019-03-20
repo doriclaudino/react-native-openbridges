@@ -31,6 +31,7 @@ export default class extends React.Component<Props> {
         <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center' }}>
           {showTitle && <Text style={{ color: 'white' }}>{value} {suffix}</Text>}
           <Slider
+            value={value}
             disabled={disabled}
             style={{
               width: '80%',
