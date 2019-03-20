@@ -1,5 +1,10 @@
 import React from 'react'
-import { createStackNavigator, createAppContainer, createDrawerNavigator, createSwitchNavigator } from 'react-navigation'
+import {
+  createStackNavigator,
+  createAppContainer,
+  createDrawerNavigator,
+  createSwitchNavigator
+} from 'react-navigation'
 import BridgeListScreen from '../screens/BridgeListScreen'
 import BridgeDetailScreen from '../screens/BridgeDetailScreen'
 import PhoneScreen from '../screens/PhoneScreen'
@@ -38,7 +43,7 @@ const DrawerNavigation = createDrawerNavigator({
 },
   {
     initialRouteName: 'Bridges',
-    contentComponent: (props) => <CustomDrawerRender {...props} />,
+    contentComponent: props => <CustomDrawerRender {...props} />,
   })
 
 const AuthStack = createStackNavigator({
