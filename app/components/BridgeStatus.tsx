@@ -137,7 +137,7 @@ export default class extends React.Component<Props> {
           {showStatus.status}
           {showStatus.when &&
             <Moment element={Text} fromNow={true}>
-              {+showStatus.when}
+              {showStatus.when.toISOString()}
             </Moment>
           }
         </Text>
