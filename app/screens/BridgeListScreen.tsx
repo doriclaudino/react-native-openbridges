@@ -11,7 +11,8 @@ import {
   FlatList,
   PermissionsAndroid,
   Animated,
-  GeoOptions
+  GeoOptions,
+  GeolocationError,
 } from 'react-native'
 import { Appbar, Button, ActivityIndicator, Snackbar, Colors } from 'react-native-paper'
 import { connect } from 'react-redux'
@@ -101,8 +102,8 @@ class BridgeListScreen extends React.Component<Props, State> {
     snackBarVisible: false,
     gpsOptions: {
       enableHighAccuracy: false,
-      timeout: 1000,
-      maximumAge: 60000,
+      timeout: 10000,
+      maximumAge: 5000,
     },
     gpsListener: -1,
   }
@@ -212,29 +213,10 @@ class BridgeListScreen extends React.Component<Props, State> {
     }
   }
 
-  _onWatchUserLocationError = () => {
+  _onWatchUserLocationError = (error: GeolocationError) => {
     this._updateLocationIcon(locationIcons.disable)
     navigator.geolocation.clearWatch(this.state.gpsListener)
-
-    if (this._existCurrentUserLocation()) {
-      this._showSnackBar(
-        'Using your old GPS location.',
-        {
-          label: 'Turn ON',
-          onPress: () => {
-            console.log('press turn on gps on settings')
-          },
-        })
-    } else {
-      this._showSnackBar(
-        'Location history not found.',
-        {
-          label: 'Turn ON',
-          onPress: () => {
-            console.log('press turn on gps on settings')
-          },
-        })
-    }
+    this._showSnackBar(error.message)
   }
 
   _sucessPosition = (pos: GeolocationReturnType) => {
@@ -336,6 +318,7 @@ class BridgeListScreen extends React.Component<Props, State> {
     try {
       const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, undefined)
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        navigator.geolocation.clearWatch(this.state.gpsListener)
         this._updateLocationIcon(locationIcons.pending)
         const listener = navigator.geolocation.watchPosition(
           this._sucessPosition,
@@ -378,7 +361,7 @@ class BridgeListScreen extends React.Component<Props, State> {
 
   }
 
-  _showSnackBar = (snackBarMessage: string, snackBarAction: object | any) => {
+  _showSnackBar = (snackBarMessage: string, snackBarAction?: object | any) => {
     this.setState({ snackBarMessage, snackBarAction, snackBarVisible: true })
   }
 
