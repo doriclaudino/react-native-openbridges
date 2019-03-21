@@ -215,8 +215,13 @@ class BridgeListScreen extends React.Component<Props, State> {
 
   _onWatchUserLocationError = (error: GeolocationError) => {
     this._updateLocationIcon(locationIcons.disable)
-    navigator.geolocation.clearWatch(this.state.gpsListener)
+    this._clearGeoListener()
     this._showSnackBar(error.message)
+  }
+
+  _clearGeoListener = () => {
+    navigator.geolocation.clearWatch(this.state.gpsListener)
+    this.setState({ gpsListener: -1 })
   }
 
   _sucessPosition = (pos: GeolocationReturnType) => {
@@ -260,7 +265,9 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _onRequestLocationClick = () => {
-    this._watchUserPosition()
+    if (this.state.gpsListener === -1) {
+      this._watchUserPosition()
+    }
   }
 
   _onSearchBarChangeText = (text: string) => {
@@ -321,7 +328,6 @@ class BridgeListScreen extends React.Component<Props, State> {
     try {
       const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, undefined)
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        navigator.geolocation.clearWatch(this.state.gpsListener)
         this._updateLocationIcon(locationIcons.pending)
         const listener = navigator.geolocation.watchPosition(
           this._sucessPosition,
