@@ -7,6 +7,7 @@ import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import com.google.firebase.database.FirebaseDatabase;
+import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
@@ -35,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
         new RNFirebasePackage(),
         new RNFirebaseAuthPackage(), 
         new RNFirebaseDatabasePackage(),
+        new RNFusedLocationPackage(),
         new FBSDKPackage(mCallbackManager), 
         new RNGestureHandlerPackage()
       );

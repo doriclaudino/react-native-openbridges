@@ -15,6 +15,7 @@
     "react-native-country-picker-modal": "^0.7.1",
     "react-native-fbsdk": "^0.8.0",
     "react-native-firebase": "^5.2.3",
+    "react-native-geolocation-service": "^2.0.0",
     "react-native-modal-datetime-picker": "^6.0.0",
     "react-native-paper": "^2.13.0",
     "react-native-vector-icons": "^6.4.1",

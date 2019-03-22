@@ -11,8 +11,6 @@ import {
   FlatList,
   PermissionsAndroid,
   Animated,
-  GeoOptions,
-  GeolocationError,
 } from 'react-native'
 import { Appbar, Button, ActivityIndicator, Snackbar, Colors, FAB } from 'react-native-paper'
 import { connect } from 'react-redux'
@@ -31,10 +29,10 @@ import {
 } from '../actions'
 import { Bridge } from 'store/bridge'
 import { NavigationParams, NavigationScreenProps } from 'react-navigation'
-import { GeolocationReturnType } from 'store/user'
+import Geolocation, { GeoPosition, GeoError, GeoWatchOptions } from 'react-native-geolocation-service'
 
 interface Props extends NavigationScreenProps {
-  setCurrentUserLocation: (pos: GeolocationReturnType) => void
+  setCurrentUserLocation: (pos: GeoPosition) => void
   updateSearchBarValue: (text: string) => void
   updatedSelectDistance: (distance: number) => void
   fetchOrCreateUI: () => void
@@ -51,7 +49,7 @@ interface State {
   snackBarVisible: boolean
   gpsListener: number
   bannerTimeout?: NodeJS.Timeout
-  gpsOptions: GeoOptions,
+  gpsOptions: GeoWatchOptions,
   locationIcon: locationIcons,
 }
 
@@ -63,7 +61,7 @@ interface MapState {
   snackBarVisible: boolean
   gpsListener: number
   bannerTimeout?: NodeJS.Timeout
-  gpsOptions: GeoOptions
+  gpsOptions: GeoWatchOptions
 }
 
 enum locationIcons {
@@ -104,8 +102,8 @@ class BridgeListScreen extends React.Component<Props, State> {
     snackBarVisible: false,
     gpsOptions: {
       enableHighAccuracy: false,
-      timeout: 10000,
-      maximumAge: 5000,
+      timeout: 10 * 1000, /* 10 secs */
+      maximumAge: 5 * 1000, /* 5 secs */
     },
     gpsListener: -1,
     locationIcon: locationIcons.disable,
@@ -209,24 +207,24 @@ class BridgeListScreen extends React.Component<Props, State> {
     }
   }
 
-  _onWatchUserLocationError = (error: GeolocationError) => {
+  _onWatchUserLocationError = (error: GeoError) => {
     this._updateLocationIcon(locationIcons.disable)
     this._clearGeoListener()
     this._showSnackBar(error.message)
   }
 
   _clearGeoListener = () => {
-    navigator.geolocation.clearWatch(this.state.gpsListener)
+    Geolocation.clearWatch(this.state.gpsListener)
     this.setState({ gpsListener: -1 })
   }
 
-  _sucessPosition = (pos: GeolocationReturnType) => {
+  _sucessPosition = (pos: GeoPosition) => {
     this.props.setCurrentUserLocation(pos)
     this._updateLocationIcon(locationIcons.enable)
   }
 
   componentWillUnmount = () => {
-    navigator.geolocation.clearWatch(this.state.gpsListener)
+    Geolocation.clearWatch(this.state.gpsListener)
   }
 
   componentWillMount = () => {
@@ -259,9 +257,7 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _onRequestLocationClick = () => {
-    if (this.state.gpsListener === -1) {
-      this._watchUserPosition()
-    }
+    this._watchUserPosition()
   }
 
   _onSearchBarChangeText = (text: string) => {
@@ -277,7 +273,7 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _getCurrentPositionOnce = async () => {
-    await navigator.geolocation.getCurrentPosition(this._sucessPosition, (error) => {
+    await Geolocation.getCurrentPosition(this._sucessPosition, (error: any) => {
       if (this._existCurrentUserLocation()) {
         this._showSnackBar(
           'Using your old GPS location.',
@@ -320,8 +316,9 @@ class BridgeListScreen extends React.Component<Props, State> {
     try {
       const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, undefined)
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.clearWatch(this.state.gpsListener)
         this._updateLocationIcon(locationIcons.pending)
-        const listener = navigator.geolocation.watchPosition(
+        const listener = Geolocation.watchPosition(
           this._sucessPosition,
           this._onWatchUserLocationError,
           this.state.gpsOptions
