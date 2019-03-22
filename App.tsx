@@ -14,6 +14,7 @@ import store from './app/store/BridgeStore'
 import { Provider as PaperProvider } from 'react-native-paper'
 import RootNavigation from './app/navigation/RootNavigation'
 import firebase from 'react-native-firebase'
+import { StatusBar } from 'react-native';
 
 class App extends React.Component {
   componentWillUnmount() {
@@ -32,6 +33,10 @@ class App extends React.Component {
   render() {
     return (
       <PaperProvider>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="#6200ee"
+        />
         <RootNavigation />
       </PaperProvider>
     )
