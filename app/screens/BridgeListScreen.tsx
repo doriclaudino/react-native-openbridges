@@ -14,10 +14,11 @@ import {
   GeoOptions,
   GeolocationError,
 } from 'react-native'
-import { Appbar, Button, ActivityIndicator, Snackbar, Colors } from 'react-native-paper'
+import { Appbar, Button, ActivityIndicator, Snackbar, Colors, FAB } from 'react-native-paper'
 import { connect } from 'react-redux'
 import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SliderAppbar from '../components/SliderAppbar'
 import SearchAppbar from '../components/SearchAppbar'
 import { filterNameAndLocation } from '../helpers'
@@ -50,7 +51,8 @@ interface State {
   snackBarVisible: boolean
   gpsListener: number
   bannerTimeout?: NodeJS.Timeout
-  gpsOptions: GeoOptions
+  gpsOptions: GeoOptions,
+  locationIcon: locationIcons,
 }
 
 interface MapState {
@@ -106,6 +108,7 @@ class BridgeListScreen extends React.Component<Props, State> {
       maximumAge: 5000,
     },
     gpsListener: -1,
+    locationIcon: locationIcons.disable,
   }
 
   static navigationOptions = ({ navigation }: NavigationScreenProps<NavigationParams>) => {
@@ -123,8 +126,6 @@ class BridgeListScreen extends React.Component<Props, State> {
 
     const currentUserLocation = navigation.getParam('currentUserLocation')
     const onFilterLocationClick = navigation.getParam('onFilterLocationClick')
-    const onRequestLocationClick = navigation.getParam('onRequestLocationClick')
-    const locationIcon = navigation.getParam('locationIcon')
 
     if (isSearchBarVisible) {
       return ({
@@ -182,11 +183,6 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => { onFilterLocationClick() }}
             />
           }
-          < Appbar.Action
-            disabled={!onRequestLocationClick}
-            icon={locationIcon}
-            onPress={() => { onRequestLocationClick() }}
-          />
         </Appbar.Header>
       ),
     })
@@ -246,10 +242,8 @@ class BridgeListScreen extends React.Component<Props, State> {
       onSearchBarChangeText: this._onSearchBarChangeText,
       onSearchClick: this._flagSearchbarVisible,
       onDistanceChange: this._onDistanceChange,
-      onRequestLocationClick: this._onRequestLocationClick,
       onFilterLocationClick: this._flagSliderLocationVisible,
       onSliderLocationCloseClick: this._flagSliderLocationVisible,
-      locationIcon: locationIcons.pending,
     })
 
     /**
@@ -279,9 +273,7 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _updateLocationIcon = (icon: locationIcons) => {
-    this.props.navigation.setParams({
-      locationIcon: icon,
-    })
+    this.setState({ locationIcon: icon })
   }
 
   _getCurrentPositionOnce = async () => {
@@ -440,6 +432,12 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => this._onItemListClick('Detail', { bridge: item })}
             />}
         />
+        <FAB
+          style={styles.fab}
+          small={true}
+          icon={() => <MaterialIcons name={this.state.locationIcon} size={24} color="white" />}
+          onPress={() => { this._onRequestLocationClick() }}
+        />
         {this._renderSnackBar()}
       </View >
     )
@@ -470,5 +468,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowColor: 'gray',
     elevation: 2,
+  },
+  fab: {
+    backgroundColor: '#6200ee',
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
 })
