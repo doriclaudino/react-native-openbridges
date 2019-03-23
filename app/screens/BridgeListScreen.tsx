@@ -19,6 +19,7 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SliderAppbar from '../components/SliderAppbar'
 import SearchAppbar from '../components/SearchAppbar'
+import VerticalTimingAnimation from '../components/VerticalTimingAnimation'
 import { filterNameAndLocation } from '../helpers'
 import {
   fetchbridges,
@@ -51,6 +52,7 @@ interface State {
   bannerTimeout?: NodeJS.Timeout
   gpsOptions: GeoWatchOptions,
   locationIcon: locationIcons,
+  VerticalViewVisibility: boolean,
 }
 
 interface MapState {
@@ -107,6 +109,7 @@ class BridgeListScreen extends React.Component<Props, State> {
     },
     gpsListener: -1,
     locationIcon: locationIcons.disable,
+    VerticalViewVisibility: false,
   }
 
   static navigationOptions = ({ navigation }: NavigationScreenProps<NavigationParams>) => {
@@ -257,7 +260,8 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _onRequestLocationClick = () => {
-    this._watchUserPosition()
+    this.flag()
+    //this._watchUserPosition()
   }
 
   _onSearchBarChangeText = (text: string) => {
@@ -393,6 +397,11 @@ class BridgeListScreen extends React.Component<Props, State> {
     }
   }
 
+  flag = () => {
+    console.log('flag')
+    this.setState({ VerticalViewVisibility: !this.state.VerticalViewVisibility })
+  }
+
   render() {
     const { filteredBridges, loading } = this.props
 
@@ -408,7 +417,6 @@ class BridgeListScreen extends React.Component<Props, State> {
           <ActivityIndicator />
         </View>)
     }
-
     return (
       <View style={styles.container}>
         {
@@ -429,6 +437,10 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => this._onItemListClick('Detail', { bridge: item })}
             />}
         />
+        <VerticalTimingAnimation visible={this.state.VerticalViewVisibility}>
+          <View style={{ backgroundColor: 'pink', height: 90, width: 40 }} />
+          <View style={{ backgroundColor: 'black', height: 30, width: 40 }} />
+        </VerticalTimingAnimation>
         <FAB
           style={styles.fab}
           small={true}
