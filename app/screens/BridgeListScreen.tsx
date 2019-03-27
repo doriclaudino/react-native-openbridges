@@ -19,7 +19,6 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SliderAppbar from '../components/SliderAppbar'
 import SearchAppbar from '../components/SearchAppbar'
-import VerticalTimingAnimation from '../components/VerticalTimingAnimation'
 import { filterNameAndLocation } from '../helpers'
 import {
   fetchbridges,
@@ -437,10 +436,6 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => this._onItemListClick('Detail', { bridge: item })}
             />}
         />
-        <VerticalTimingAnimation visible={this.state.VerticalViewVisibility}>
-          <View style={{ backgroundColor: 'pink', height: 90, width: 40 }} />
-          <View style={{ backgroundColor: 'black', height: 30, width: 40 }} />
-        </VerticalTimingAnimation>
         <FAB
           style={styles.fab}
           small={true}
