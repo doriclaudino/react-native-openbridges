@@ -11,8 +11,9 @@ import {
   FlatList,
   PermissionsAndroid,
   Animated,
+  Image,
 } from 'react-native'
-import { Appbar, Button, ActivityIndicator, Snackbar, Colors, FAB } from 'react-native-paper'
+import { Appbar, Button, ActivityIndicator, Snackbar, Colors, FAB, Text, IconButton } from 'react-native-paper'
 import { connect } from 'react-redux'
 import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
@@ -30,6 +31,7 @@ import {
 import { Bridge } from 'store/bridge'
 import { NavigationParams, NavigationScreenProps } from 'react-navigation'
 import Geolocation, { GeoPosition, GeoError, GeoWatchOptions } from 'react-native-geolocation-service'
+import BottomToast from '../components/BottomToast';
 
 interface Props extends NavigationScreenProps {
   setCurrentUserLocation: (pos: GeoPosition) => void
@@ -49,9 +51,8 @@ interface State {
   snackBarVisible: boolean
   gpsListener: number
   bannerTimeout?: NodeJS.Timeout
-  gpsOptions: GeoWatchOptions,
-  locationIcon: locationIcons,
-  VerticalViewVisibility: boolean,
+  gpsOptions: GeoWatchOptions
+  locationIcon: locationIcons
 }
 
 interface MapState {
@@ -108,7 +109,6 @@ class BridgeListScreen extends React.Component<Props, State> {
     },
     gpsListener: -1,
     locationIcon: locationIcons.disable,
-    VerticalViewVisibility: false,
   }
 
   static navigationOptions = ({ navigation }: NavigationScreenProps<NavigationParams>) => {
@@ -223,6 +223,12 @@ class BridgeListScreen extends React.Component<Props, State> {
   _sucessPosition = (pos: GeoPosition) => {
     this.props.setCurrentUserLocation(pos)
     this._updateLocationIcon(locationIcons.enable)
+    const bridgeDistance = 0.2 //300 meters?
+    const closestBridge = this.props.filteredBridges[0]
+
+    if (this.props.filteredBridges && closestBridge.distance < bridgeDistance && !this.state.bannerVisible) {
+      this.setState({ bannerVisible: true })
+    }
   }
 
   componentWillUnmount = () => {
@@ -245,22 +251,10 @@ class BridgeListScreen extends React.Component<Props, State> {
       onFilterLocationClick: this._flagSliderLocationVisible,
       onSliderLocationCloseClick: this._flagSliderLocationVisible,
     })
-
-    /**
-     * slide when user enter on Bridge GPS Boundary
-     */
-    /*
-    const bannerTimeout = setTimeout(() => {
-      this.slide()
-    }, 2000)
-    this.setState({ bannerTimeout })
-    */
-
   }
 
   _onRequestLocationClick = () => {
-    this.flag()
-    //this._watchUserPosition()
+    this._watchUserPosition()
   }
 
   _onSearchBarChangeText = (text: string) => {
@@ -357,9 +351,7 @@ class BridgeListScreen extends React.Component<Props, State> {
     if (!this.props.ui || !this.props.ui.currentUserLocation) {
       return false
     }
-
     return true
-
   }
 
   _showSnackBar = (snackBarMessage: string, snackBarAction?: object | any) => {
@@ -379,30 +371,9 @@ class BridgeListScreen extends React.Component<Props, State> {
     )
   }
 
-  slide = () => {
-    if (!this.state.bannerVisible) {
-      this.setState({
-        bannerVisible: true,
-      })
-      Animated.spring(this.state.initialY, {
-        speed: 1,
-        toValue: 0,
-      }).start()
-    } else {
-      this.setState({
-        bannerVisible: false,
-        initialY: new Animated.Value(-300),
-      })
-    }
-  }
-
-  flag = () => {
-    console.log('flag')
-    this.setState({ VerticalViewVisibility: !this.state.VerticalViewVisibility })
-  }
-
   render() {
     const { filteredBridges, loading } = this.props
+    const closestBridge = filteredBridges[0]
 
     if (loading) {
       return (
@@ -418,13 +389,6 @@ class BridgeListScreen extends React.Component<Props, State> {
     }
     return (
       <View style={styles.container}>
-        {
-          this.state.bannerVisible &&
-          <Animated.View style={[styles.animatedBanner, { transform: [{ translateY: this.state.initialY }] }]}>
-            <Button onPress={() => this.slide()}>Hide</Button>
-          </Animated.View>
-        }
-
         <FlatList
           style={styles.container}
           data={filteredBridges}
@@ -436,6 +400,50 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => this._onItemListClick('Detail', { bridge: item })}
             />}
         />
+        <BottomToast
+          visible={this.state.bannerVisible}
+          onDismiss={() => this.setState({ bannerVisible: false })}
+          duration={5000}
+        >
+          {
+            closestBridge &&
+            <View style={{
+              flex: 1,
+              flexDirection: 'row',
+              width: '100%',
+              height: 120,
+              paddingHorizontal: 3,
+              paddingTop: 3,
+              backgroundColor: 'gray'
+            }}>
+              <View style={{
+                marginVertical: 0,
+                marginLeft: 6,
+                marginRight: 6,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <Image style={styles.image} source={{ uri: closestBridge.src }} />
+              </View>
+              <View style={{
+                flex: 1,
+                width: '100%',
+              }}>
+                <View style={{
+                  flexDirection: 'column',
+                  flex: 1,
+                  width: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <IconButton icon="close" style={{ position: 'absolute', top: -10, right: -10 }} onPress={() => { this.setState({ bannerVisible: false }) }} />
+                  <Text style={{ margin: 5, fontSize: 18, }}>is this bridge closed?</Text>
+                  <Button mode="contained" icon="thumb-up">CONFIRM</Button>
+                </View>
+              </View>
+            </View>
+          }
+        </BottomToast>
         <FAB
           style={styles.fab}
           small={true}
@@ -479,5 +487,11 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
+  },
+  image: {
+    width: 100,
+    height: 60,
+    overflow: 'hidden',
+    borderRadius: 10,
   },
 })
