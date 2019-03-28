@@ -3,7 +3,7 @@ import { Text } from 'react-native'
 import { Card } from 'react-native-paper'
 import Moment from 'react-moment'
 import { Bridge, IStatus, IEvent } from 'store/bridge'
-import { getLastEventFromNow, isCloseEventType } from '../helpers';
+import { getLastEventFromNow, isCloseEventType } from '../helpers'
 
 //tslint:disable:max-classes-per-file
 class Status implements IStatus {

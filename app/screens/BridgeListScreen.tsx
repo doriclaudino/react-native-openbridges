@@ -13,14 +13,14 @@ import {
   Animated,
   Image,
 } from 'react-native'
-import { Appbar, Button, ActivityIndicator, Snackbar, Colors, FAB, Text, IconButton } from 'react-native-paper'
+import { Appbar, ActivityIndicator, Snackbar, Colors, FAB } from 'react-native-paper'
 import { connect } from 'react-redux'
 import BridgeItem from '../components/BridgeItem'
 import Entypo from 'react-native-vector-icons/Entypo'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SliderAppbar from '../components/SliderAppbar'
 import SearchAppbar from '../components/SearchAppbar'
-import { filterNameAndLocation } from '../helpers'
+import { filterNameAndLocation, filterByCloseStatus } from '../helpers'
 import {
   fetchbridges,
   fetchOrCreateUI,
@@ -31,7 +31,7 @@ import {
 import { Bridge } from 'store/bridge'
 import { NavigationParams, NavigationScreenProps } from 'react-navigation'
 import Geolocation, { GeoPosition, GeoError, GeoWatchOptions } from 'react-native-geolocation-service'
-import BottomToast from '../components/BottomToast';
+import ConfirmBridgeStatus from '../components/ConfirmBridgeStatus'
 
 interface Props extends NavigationScreenProps {
   setCurrentUserLocation: (pos: GeoPosition) => void
@@ -40,6 +40,7 @@ interface Props extends NavigationScreenProps {
   fetchOrCreateUI: () => void
   fetchbridges: () => void
   filteredBridges: Bridge[]
+  closedBridges: Bridge[]
   loading: boolean
   ui: any
 }
@@ -75,6 +76,7 @@ enum locationIcons {
 const mapStateToProps = (state: MapState, ownProps: Props) => {
   let loading = true
   let filteredBridges: Bridge[] = []
+  let closedBridges: Bridge[] = []
   if (state.ui && state.bridges && state.bridges.length) {
     filteredBridges = state.bridges
       .filter(bridge => filterNameAndLocation(
@@ -84,9 +86,11 @@ const mapStateToProps = (state: MapState, ownProps: Props) => {
         state.ui.selectedDistance
       ))
       .sort((a, b) => a.distance - b.distance)
+
+    closedBridges = filterByCloseStatus(filteredBridges)
   }
   loading = false
-  return { loading, filteredBridges, ui: state.ui, }
+  return { loading, filteredBridges, closedBridges, ui: state.ui, }
 }
 
 const mapDispatchToProps = {
@@ -223,10 +227,10 @@ class BridgeListScreen extends React.Component<Props, State> {
   _sucessPosition = (pos: GeoPosition) => {
     this.props.setCurrentUserLocation(pos)
     this._updateLocationIcon(locationIcons.enable)
-    const bridgeDistance = 0.2 //300 meters?
-    const closestBridge = this.props.filteredBridges[0]
+    const bridgeDistance = 0.8 //300 meters?
+    const closestBridge = this.props.closedBridges[0]
 
-    if (this.props.filteredBridges && closestBridge.distance < bridgeDistance && !this.state.bannerVisible) {
+    if (closestBridge && closestBridge.distance < bridgeDistance && !this.state.bannerVisible) {
       this.setState({ bannerVisible: true })
     }
   }
@@ -254,6 +258,7 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   _onRequestLocationClick = () => {
+    //this.setState({ bannerVisible: true })
     this._watchUserPosition()
   }
 
@@ -372,8 +377,8 @@ class BridgeListScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { filteredBridges, loading } = this.props
-    const closestBridge = filteredBridges[0]
+    const { filteredBridges, loading, closedBridges } = this.props
+    const closestBridge = closedBridges[0]
 
     if (loading) {
       return (
@@ -400,56 +405,26 @@ class BridgeListScreen extends React.Component<Props, State> {
               onPress={() => this._onItemListClick('Detail', { bridge: item })}
             />}
         />
-        <BottomToast
+        <ConfirmBridgeStatus
           visible={this.state.bannerVisible}
+          bridge={closestBridge}
           onDismiss={() => this.setState({ bannerVisible: false })}
-          duration={5000}
-        >
-          {
-            closestBridge &&
-            <View style={{
-              flex: 1,
-              flexDirection: 'row',
-              width: '100%',
-              height: 120,
-              paddingHorizontal: 3,
-              paddingTop: 3,
-              backgroundColor: 'gray'
-            }}>
-              <View style={{
-                marginVertical: 0,
-                marginLeft: 6,
-                marginRight: 6,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                <Image style={styles.image} source={{ uri: closestBridge.src }} />
-              </View>
-              <View style={{
-                flex: 1,
-                width: '100%',
-              }}>
-                <View style={{
-                  flexDirection: 'column',
-                  flex: 1,
-                  width: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <IconButton icon="close" style={{ position: 'absolute', top: -10, right: -10 }} onPress={() => { this.setState({ bannerVisible: false }) }} />
-                  <Text style={{ margin: 5, fontSize: 18, }}>is this bridge closed?</Text>
-                  <Button mode="contained" icon="thumb-up">CONFIRM</Button>
-                </View>
-              </View>
-            </View>
-          }
-        </BottomToast>
-        <FAB
-          style={styles.fab}
-          small={true}
-          icon={() => <MaterialIcons name={this.state.locationIcon} size={24} color="white" />}
-          onPress={() => { this._onRequestLocationClick() }}
+          onConfirmPress={() => {
+            console.log('onConfirmPressed')
+            this.setState({ bannerVisible: false })
+          }}
+          duration={5 * 1000}
         />
+        {
+          !this.state.bannerVisible &&
+          <FAB
+            style={styles.fab}
+            small={true}
+            icon={() => <MaterialIcons name={this.state.locationIcon} size={24} color="white" />}
+            onPress={() => { this._onRequestLocationClick() }}
+          />
+        }
+
         {this._renderSnackBar()}
       </View >
     )
