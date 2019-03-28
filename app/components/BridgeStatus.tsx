@@ -3,6 +3,7 @@ import { Text } from 'react-native'
 import { Card } from 'react-native-paper'
 import Moment from 'react-moment'
 import { Bridge, IStatus, IEvent } from 'store/bridge'
+import { getLastEventFromNow, isCloseEventType } from '../helpers';
 
 //tslint:disable:max-classes-per-file
 class Status implements IStatus {
@@ -91,19 +92,15 @@ export default class extends React.Component<Props> {
   }
 
   filterLastEvent = (bridge: Bridge) => {
-    if (bridge.events) {
-      const sortEvents = bridge.events
-        .filter(event => event && new Date() > new Date(event.when))
-        .sort((a, b) => +new Date(b.when) - +new Date(a.when))
-      const lastEvent = sortEvents.shift()
+    const lastEvent = getLastEventFromNow(bridge)
 
-      if (lastEvent) {
-        if (this.isClose(lastEvent)) {
-          return new ClosedStatus(lastEvent.when)
-        }
-        return new OpenedStatus(lastEvent.when)
+    if (lastEvent) {
+      if (this.isClose(lastEvent)) {
+        return new ClosedStatus(lastEvent.when)
       }
+      return new OpenedStatus(lastEvent.when)
     }
+
     return new UnkownStatus()
   }
 
@@ -125,7 +122,7 @@ export default class extends React.Component<Props> {
   }
 
   isClose = (event: IEvent) => {
-    return event.status.toLowerCase().indexOf('close') > -1
+    return isCloseEventType(event)
   }
 
   render() {

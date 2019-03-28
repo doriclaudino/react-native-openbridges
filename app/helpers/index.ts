@@ -1,5 +1,5 @@
 import { GeolocationReturnType } from 'store/user'
-import { BridgeGeoLocation, Bridge } from 'store/bridge'
+import { BridgeGeoLocation, Bridge, IEvent } from 'store/bridge'
 
 /**
  * @param {*} obj
@@ -15,6 +15,20 @@ export const parseToArrayWithId = (obj: any) => {
     })
   }
   return []
+}
+
+export const getLastEventFromNow = (bridge: Bridge) => {
+  if (bridge.events) {
+    const sortEvents = bridge.events
+      .filter(event => event && new Date() > new Date(event.when))
+      .sort((a, b) => +new Date(b.when) - +new Date(a.when))
+    return sortEvents.shift()
+  }
+  return undefined
+}
+
+export const isCloseEventType = (event: IEvent) => {
+  return event.status.toLowerCase().indexOf('close') > -1
 }
 
 export const capitalizeSentence = (sentence: string) => {
@@ -55,6 +69,14 @@ const isNearby = (bridge: Bridge, loc2: GeolocationReturnType, definedDistance: 
   bridge.distance = distanceBetween
   return distanceBetween <= definedDistance
 }
+
+export const filterByCloseStatus = (bridges: Bridge[]) => {
+  return bridges.filter((bridge) => {
+    const lastEvent = getLastEventFromNow(bridge)
+    return lastEvent && isCloseEventType(lastEvent)
+  })
+}
+
 
 export const filterNameAndLocation = (
   bridge: Bridge,
